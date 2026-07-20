@@ -1,0 +1,28 @@
+generated: '2026-07-19'
+method: searched
+source: openapi/fingoal-insights-openapi-original.json
+docs: https://docs.fingoal.dev/
+summary:
+  types:
+  - oauth2
+  oauth2_flows:
+  - clientCredentials
+notes: >-
+  The Insights API is declared as OAuth2 clientCredentials in the OpenAPI, but
+  the token is minted by a custom endpoint: POST
+  https://findmoney.fingoal.com/v3/authentication with a JSON body
+  {"client_id","client_secret"} returns a JWT `access_token`. That JWT is then
+  sent as `Authorization: Bearer <token>` on every request. Developer
+  credentials are issued on request (24h turnaround) via
+  https://fingoal.com/request-developer-account - there is no public self-serve
+  signup. Dev credentials target the findmoney-dev host; production the
+  findmoney host.
+schemes:
+- name: Authentication
+  type: oauth2
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://findmoney.fingoal.com/v3/authentication
+    scopes: 1
+  sources:
+  - openapi/fingoal-insights-openapi-original.json
