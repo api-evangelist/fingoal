@@ -1,0 +1,26 @@
+generated: '2026-07-19'
+method: generated
+source: openapi/fingoal-insights-openapi-original.json
+skills:
+- file: fingoal-enrich-transactions.md
+  name: Enrich a batch of transactions with FinGoal
+  api: openapi/fingoal-insights-openapi-original.json
+  operations:
+  - asyncCleanupTransactions
+  - getEnrichment
+  - upsertWebhookConfiguration
+- file: fingoal-user-tags.md
+  name: Retrieve and refresh FinGoal user Persona Tags
+  api: openapi/fingoal-insights-openapi-original.json
+  operations:
+  - getOneUser
+  - getOneUserSync
+  - getUserTagUpdates
+- file: fingoal-manage-webhooks.md
+  name: Manage FinGoal Insights API webhooks
+  api: openapi/fingoal-insights-openapi-original.json
+  operations:
+  - listWebhookConfigurations
+  - upsertWebhookConfiguration
+  - testWebhook
+  - deleteWebhookConfiguration

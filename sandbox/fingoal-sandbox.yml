@@ -1,0 +1,32 @@
+generated: '2026-07-19'
+method: searched
+source: openapi/fingoal-insights-openapi-original.json
+docs: https://docs.fingoal.dev/
+environments:
+- name: development
+  base_url: https://findmoney-dev.fingoal.com/v3
+  description: >-
+    Development environment issued with the dev credentials FinGoal sends within
+    24h of a developer-account request. Used for the quickstart.
+- name: production
+  base_url: https://findmoney.fingoal.com/v3
+  description: Live enrichment environment.
+test_endpoints:
+- operation: syncCleanupTransactions
+  path: POST /cleanup/sync
+  purpose: >-
+    "Test Transaction Enrichment" - synchronous endpoint that returns enriched
+    results immediately (rather than via async batch + webhook), intended for
+    testing and small payloads.
+- operation: testWebhook
+  path: POST /webhook-configurations/test
+  purpose: >-
+    Sends a sample ENRICHMENT_DATA or USER_TAGS_DATA payload to your configured
+    callback so you can verify webhook handling before going live.
+credentials:
+  model: request-based
+  note: >-
+    No self-serve keys and no published magic test values or test cards. Request
+    development credentials at https://fingoal.com/request-developer-account
+    (~24h turnaround); FinGoal never handles card/account numbers, so there is no
+    test-card fixture surface.

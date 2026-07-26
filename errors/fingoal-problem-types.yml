@@ -1,0 +1,68 @@
+generated: '2026-07-19'
+method: derived
+source: openapi/fingoal-insights-openapi-original.json
+docs: https://docs.fingoal.dev/
+format: custom
+envelope: >-
+  On a 400 the Insights API returns an array of validation errors describing
+  fields that are not allowed or are incorrectly formatted (per-transaction for
+  the /cleanup endpoints). Auth and scope failures use plain status codes with a
+  short message. This is NOT RFC 9457 application/problem+json.
+problems:
+- status: 400
+  title: Bad request
+  description: >-
+    An array of errors is returned. Fields not allowed or incorrectly formatted
+    are noted. For webhook-configuration writes the message enumerates the exact
+    missing/invalid field (client_id header is required, webhook_type is
+    required, Invalid webhook_type, callback_url is required, callback_url must
+    be a valid URL).
+  source_operations:
+  - syncCleanupTransactions
+  - asyncCleanupTransactions
+  - streamingCleanupTransactions
+  - baseCleanupTransactions
+  - listWebhookConfigurations
+  - upsertWebhookConfiguration
+  - deleteWebhookConfiguration
+  - testWebhook
+- status: 401
+  title: Unauthorized
+  description: >-
+    Missing, malformed, or expired Bearer JWT. Re-mint a token at POST
+    /v3/authentication with your client_id and client_secret.
+  source_operations:
+  - syncCleanupTransactions
+  - asyncCleanupTransactions
+  - streamingCleanupTransactions
+  - baseCleanupTransactions
+  - getEnrichment
+  - getOneUser
+  - getOneUserSync
+  - getUserTagUpdates
+  - listWebhookConfigurations
+  - upsertWebhookConfiguration
+  - deleteWebhookConfiguration
+  - testWebhook
+- status: 403
+  title: Forbidden
+  description: >-
+    Missing required `enrichment` scope, or the client does not have a
+    relationship with the specified tenant.
+  source_operations:
+  - listWebhookConfigurations
+  - upsertWebhookConfiguration
+  - deleteWebhookConfiguration
+  - testWebhook
+- status: 404
+  title: Not found
+  description: >-
+    The addressed resource does not exist: no transactions found for the given
+    batch_request_id, the user ID could not be found, or the webhook
+    configuration was not found.
+  source_operations:
+  - getEnrichment
+  - getOneUser
+  - getOneUserSync
+  - getUserTagUpdates
+  - deleteWebhookConfiguration

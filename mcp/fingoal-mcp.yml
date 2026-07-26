@@ -1,0 +1,48 @@
+generated: '2026-07-19'
+method: derived
+status: candidate
+source: openapi/fingoal-insights-openapi-original.json
+note: >-
+  No official hosted/remote FinGoal MCP server was found (docs, npm
+  @modelcontextprotocol, MCP registries). Tools below are candidate mappings,
+  one per Insights API operation, to seed a future MCP server.
+server:
+  name: fingoal-insights
+  transport: http
+tools:
+- name: test_enrich_transactions
+  description: Synchronously enrich a test batch of transactions.
+  source_operation: openapi/fingoal-insights-openapi-original.json#syncCleanupTransactions
+- name: enrich_transactions
+  description: Submit a batch of transactions for asynchronous historical enrichment.
+  source_operation: openapi/fingoal-insights-openapi-original.json#asyncCleanupTransactions
+- name: streaming_enrich_transactions
+  description: Submit transactions for streaming enrichment.
+  source_operation: openapi/fingoal-insights-openapi-original.json#streamingCleanupTransactions
+- name: base_enrich_transactions
+  description: Submit transactions for base enrichment.
+  source_operation: openapi/fingoal-insights-openapi-original.json#baseCleanupTransactions
+- name: get_enrichment
+  description: Retrieve enrichment results by batch_request_id.
+  source_operation: openapi/fingoal-insights-openapi-original.json#getEnrichment
+- name: get_user
+  description: Get a user and their tags.
+  source_operation: openapi/fingoal-insights-openapi-original.json#getOneUser
+- name: trigger_user_tag_update
+  description: Trigger a user tag update / calls-to-action refresh.
+  source_operation: openapi/fingoal-insights-openapi-original.json#getOneUserSync
+- name: get_user_tag_updates
+  description: Retrieve updated tags by guid.
+  source_operation: openapi/fingoal-insights-openapi-original.json#getUserTagUpdates
+- name: list_webhook_configurations
+  description: List webhook configurations.
+  source_operation: openapi/fingoal-insights-openapi-original.json#listWebhookConfigurations
+- name: upsert_webhook_configuration
+  description: Create or update a webhook configuration.
+  source_operation: openapi/fingoal-insights-openapi-original.json#upsertWebhookConfiguration
+- name: delete_webhook_configuration
+  description: Delete a webhook configuration.
+  source_operation: openapi/fingoal-insights-openapi-original.json#deleteWebhookConfiguration
+- name: test_webhook
+  description: Send a sample webhook payload to a callback URL.
+  source_operation: openapi/fingoal-insights-openapi-original.json#testWebhook

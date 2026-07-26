@@ -1,0 +1,36 @@
+generated: '2026-07-19'
+method: searched
+source: openapi/fingoal-insights-openapi-original.json
+docs: https://docs.fingoal.dev/
+spec_type: Webhooks
+note: >-
+  FinGoal documents a webhook event surface but publishes no AsyncAPI document.
+  Webhooks are registered/managed through the /webhook-configurations endpoints
+  (list, upsert, delete, test) and delivered to a client-supplied HTTPS
+  callback_url.
+management_operations:
+- listWebhookConfigurations
+- upsertWebhookConfiguration
+- deleteWebhookConfiguration
+- testWebhook
+events:
+- webhook_type: ENRICHMENT_DATA
+  trigger: >-
+    An asynchronous enrichment batch has completed. Notification carries
+    batch_request_id (plus client_id and tenant_id) so the consumer can retrieve
+    or has been delivered enrichedTransactions[] and failedTransactions[].
+  payload_fields:
+  - enrichedTransactions
+  - failedTransactions
+  notification_ref_fields:
+  - batch_request_id
+  - client_id
+  - tenant_id
+- webhook_type: USER_TAGS_DATA
+  trigger: A user's Persona / behavioral tags have been updated.
+  payload_fields:
+  - tenant_id
+  - userTags
+delivery:
+  transport: https-post
+  target: callback_url (per webhook configuration)

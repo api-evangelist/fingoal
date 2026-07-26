@@ -1,25 +1,255 @@
 aid: fingoal
 name: FinGoal
-description: FinGoal is a company surfaced as a portfolio company of techstars and added to the API Evangelist
-  network as a stub for enrichment. This profile is a lead awaiting the enrichment pipeline.
+description: >-
+  FinGoal provides financial data insights for banks, credit unions, and
+  fintechs. Its Insights API enriches raw bank and card transaction data with
+  clean merchant names, categorization, and behavioral "Persona Tags" that power
+  personalized recommendations, targeted offers, and better banking features.
+  The API is batch-oriented: developers submit transactions, receive a
+  batch_request_id, and collect enriched results by polling or via ENRICHMENT_DATA
+  and USER_TAGS_DATA webhooks. FinGoal also offers Link Money for account
+  aggregation and verification across 17,000+ financial institutions.
+  Authentication uses a JWT minted from client_id/client_secret; developer
+  credentials are issued on request. FinGoal is SOC 2 Type II and GDPR compliant.
+accessModel:
+  pricing: unknown
+  onboarding: self-serve
+  trial: false
+  try_now: false
+  public: false
+  label: Self-serve signup
+  confidence: medium
+  source:
+  - authentication
+  generated: '2026-07-22'
+  method: derived
+image: https://cdn.prod.website-files.com/61d89a2cbc85dcbc83bb0f7c/637402586ca49d150ef97dc2_Website%20Open%20Graph%20%20Thumbnail.png
 url: https://raw.githubusercontent.com/api-evangelist/fingoal/refs/heads/main/apis.yml
 x-type: company
 x-source: vc-portfolio
 x-backed-by:
 - techstars
-x-tier: stub
-x-tier-reason: portfolio-lead
 specificationVersion: '0.20'
 created: '2026-07-17'
-modified: '2026-07-17'
+modified: '2026-07-19'
 tags:
-- Company
-apis: []
+- Financial Services
+- Fintech
+- Transaction Enrichment
+- Data Enrichment
+- Personal Financial Management
+- Banking
+- Categorization
+- Webhooks
+apis:
+- aid: fingoal:fingoal-enrichment-api
+  name: FinGoal Enrichment API
+  description: "The Insights API's transaction enrichment endpoints enable developers to clean and enhance\
+    \ their transaction data. This process includes standardizing merchant names, categorizing transactions,\
+    \ and adding additional metadata. It also supports transaction-level tagging. Transactions submitted\
+    \ to the enrichment endpoints contribute to the Insights API's user tagging capabilities. \n\nThe\
+    \ Insights API offers both synchronous and asynchronous flows. The synchronous flow is a direct request-response\
+    \ model intended for testing and development purposes only. All production requests should use the\
+    \ asynchronous historical and streaming transaction enrichment endpoints.\n\n<a href=\"https://docs.google.com/spreadsheets/d/1XL649eKzMZ21WGWdcUE4cvKbKb6oXzfdBv5Ob8qPpbM/edit?usp=sharing\"\
+    \ target=\"blank\">View Full List of FinGoal Categories</a>\n\n<a href=\"https://fingoal.com/tags-list\"\
+    \ target=\"blank\">View Full List of FinGoal Tags</a>\n\n\n## Enrichment Quickstart\nThis quickstart\
+    \ requires a JWT, which can be generated following the top-level authentication quickstart. Ensure\
+    \ you have a valid JWT before proceeding.\n\n### 1. Prepare the Request Body\nThe request body should\
+    \ be a JSON object with a single parameter, `transactions`, which must be an array. Each transaction\
+    \ must include the following fields:\n- `uid`: A unique user identifier.\n- `amountnum`: The transaction\
+    \ amount.\n- `date`: The transaction date.\n- `original_description`: The original transaction description.\n\
+    - `transactionid`: The unique transaction identifier.\n- `accountType`: The account type.\n- `settlement`:\
+    \ The settlement type.\n\n```json\n{\n  \"transactions\": [\n    {\n      \"uid\": \"16432789fdsa78\"\
+    ,\n      \"accountid\": \"1615\",\n      \"amountnum\": 12.41,\n      \"date\": \"2024-05-11\",\n\
+    \      \"original_description\": \"T0064 TARGET STORE\",\n      \"transactionid\": \"988cee06-5d36-11ec-b00b-bc8d8f2303a12733\"\
+    ,\n      \"accountType\" : \"creditCard\",\n      \"settlement\": \"debit\"\n    }\n  ]\n}\n```\n\
+    ### 2. Make a POST Request\nMake a POST request to the Insights API cleanup endpoint using the prepared\
+    \ JSON object. Include the JWT in the `Authorization` header.\n```js\n  const headers = new Headers();\n\
+    \  headers.append(\"Authorization\", \"Bearer {YOUR_TOKEN}\");\n  headers.append(\"Content-Type\"\
+    , \"application/json\");\n\n  const body = JSON.stringify({\n    \"transactions\": [\n      {\n  \
+    \      \"uid\": \"16432789fdsa78\",\n        \"accountid\": \"1615\",\n        \"amountnum\": 12.41,\n\
+    \        \"date\": \"2024-05-11\",\n        \"original_description\": \"T0064 TARGET STORE\",\n  \
+    \      \"transactionid\": \"988cee06-5d36-11ec-b00b-bc8d8f2303a12733\",\n        \"accountType\" :\
+    \ \"creditCard\",\n        \"settlement\": \"debit\"\n      }\n    ]\n  });\n\n  const requestOptions\
+    \ = {\n    method: 'POST',\n    redirect: 'follow'\n    headers,\n    body,\n  };\n\n  try {\n   \
+    \ const response = await fetch(\"https://findmoney-dev.fingoal.com/v3/cleanup\", requestOptions);\n\
+    \    const data = response.json();\n    console.log(data);\n  } catch(error) {\n    console.log('ERROR:',\
+    \ error);\n  }\n```\nThe JavaScript code above uses the `fetch` API to request transaction enrichment.\
+    \ If the request succeeds, it logs the response body. If an error occurs, it logs the error.\n###\
+    \ 3. Extract the Batch Request ID from a Successful Response\nIf the request is successful, the response\
+    \ body will contain a JSON object with a single parameter, `status`. The `status` object has the following\
+    \ structure:\n- `transactions_received`: Whether or not the transactions were successfully enqueued\
+    \ for enrichment.\n- `transactions_validated`: Whether or not the transactions were successfully validated.\n\
+    - `processing`: Whether or not the transactions are currently being processed.\n- `num_transactions_processing`:\
+    \ The number of transactions that are currently being processed.\n- `batch_request_id`: The unique\
+    \ identifier for the batch request.\n\n```json\n{\n  \"status\": {\n    \"transactions_received\"\
+    : true,\n    \"transactions_validated\": true,\n    \"processing\": true,\n    \"num_transactions_processing\"\
+    : 1,\n    \"batch_request_id\": \"988cee06-5d36-11ec-b00b-bc8d8f2303a12733\"\n  }\n}\n```\nThe `batch_request_id`\
+    \ is a unique identifier for the batch request. You will use this identifier to retrieve the enriched\
+    \ transactions. \n### 4. Listen for the Enrichment Completion Event \nTo receive a webhook notification\
+    \ for a completed enrichment batch, you must submit a webhook URL. Use the FinGoal support email (support@fingoal.com)\
+    \ to submit a webhook URL for registry. Once the URL is registered, you will automatically receive\
+    \ all future enrichment completion webhooks. \n\nWebhook notifications are sent as HTTP POST requests\
+    \ to the registered URL. The webhook URL must be publicly accessible and support HTTPS connections.\
+    \ The Insights API cannot send webhooks to a non-HTTPS URL. \n\nThe webhook payload contains a JSON\
+    \ object with the following structure: \n- `batch_request_id`: The unique identifier for the batch\
+    \ request.\n\nThe `batch_request_id` corresponds to the `batch_request_id` returned in the initial\
+    \ enrichment request. \n```json\n{\n  \"batch_request_id\": \"988cee06-5d36-11ec-b00b-bc8d8f2303a12733\"\
+    \n}\n```\n#### Verifying the Enrichment Webhook \nEvery enrichment complete webhook includes an `X-Webhook-Verification`\
+    \ header. The header contains a SHA-256 HMAC signature of the webhook payload. To verify the webhook,\
+    \ you must generate a SHA-256 HMAC signature using the webhook payload and your Insights API secret\
+    \ key. If the generated signature matches the signature in the `X-Webhook-Verification` header, the\
+    \ webhook is valid. If not, the webhook should be discarded. \n\nThe following snippet demonstrates\
+    \ how to verify the webhook signature using Node.js with the `crypto` and `express` libraries.\n```js\n\
+    const crypto = require('crypto');\nconst express = require('express');\nconst app = express();\n\n\
+    app.use(express.json());\napp.post('/webhook-receiver', (req, res) => {\n  const { headers, body }\
+    \ = req;\n  const { 'x-webhook-verification': signature } = headers;\n  if (!signature) {\n    res.status(400).send('Reject\
+    \ the webhook if no verification header is present.');\n    return;\n  }\n\n  const secret = 'YOUR_CLIENT_SECRET';\n\
+    \  const payload = JSON.stringify(body);\n  const hmac = crypto.createHmac('sha256', secret);\n  const\
+    \ digest = hmac.update(payload).digest('hex');\n\n  if (digest === signature) {\n    res.status(200).send('The\
+    \ webhook is verified. It is safe to process the payload.'); \n  } else {\n    res.status(400).send('The\
+    \ Webhook verification is incorrect for the payload. Reject the webhook.');\n  }\n});\n```\n\n###\
+    \ 5. Retrieve the Enriched Transactions\nWith the `batch_request_id`, submit a GET request to the\
+    \ Insights API enrichment retrieval endpoint. Include the JWT in the `Authorization` header. \n```js\n\
+    \  const headers = new Headers();\n  headers.append(\"Authorization\", \"Bearer {YOUR_TOKEN}\");\n\
+    \n  const requestOptions = {\n    method: 'GET',\n    redirect: 'follow',\n    headers,\n  };\n\n\
+    \  try {\n    const response = await fetch(\"https://findmoney-dev.fingoal.com/v3/cleanup/{batch_request_id}\"\
+    , requestOptions);\n    const data = response.json();\n    console.log(data);\n  } catch(error) {\n\
+    \    console.log('ERROR:', error);\n  }\n```\nThe JavaScript code above uses the `fetch` API to request\
+    \ the enriched transactions. If the request succeeds, it logs the response body. If an error occurs,\
+    \ it logs the error.\n### Successful Response\nIf the request is successful, the response body will\
+    \ contain a JSON object a single parameter, `enrichedTransactions`. The `enrichedTransactions` array\
+    \ will contain all available transaction-level enrichment for the data in this batch. \n\n### Best\
+    \ Practices \n- Group transactions by `uid` for optimal performance. \n- Provide as much information\
+    \ as possible in the request body to improve enrichment quality.\n- Use unique `uid` and `transactionid`\
+    \ values for each user and transaction. These identifiers may need to be cross-referenced with your\
+    \ system's data in the future.\n- Avoid using personally identifiable information (PII) in the `uid`\
+    \ or `transactionid` fields. We recommend using a UUID or similar anonymous identifier instead."
+  humanURL: https://docs.fingoal.dev/
+  baseURL: https://findmoney.fingoal.com/v3
+  tags:
+  - Enrichment
+  properties:
+  - type: OpenAPI
+    url: openapi/fingoal-enrichment-api-openapi.yml
+  - type: Documentation
+    url: https://docs.fingoal.dev/
+  - type: APIReference
+    url: https://docs.fingoal.dev/
+  - type: Postman
+    url: https://fingoal.dev/FinGoal%20Enrichment.postman_collection.json
+  - type: Webhooks
+    url: asyncapi/fingoal-webhooks.yml
+  - type: ErrorCatalog
+    url: errors/fingoal-problem-types.yml
+  - type: DataModel
+    url: data-model/fingoal-data-model.yml
+- aid: fingoal:fingoal-user-tagging-api
+  name: FinGoal User Tagging API
+  description: markdown/tagging.md
+  humanURL: https://docs.fingoal.dev/
+  baseURL: https://findmoney.fingoal.com/v3
+  tags:
+  - User Tagging
+  properties:
+  - type: OpenAPI
+    url: openapi/fingoal-user-tagging-api-openapi.yml
+  - type: Documentation
+    url: https://docs.fingoal.dev/
+  - type: APIReference
+    url: https://docs.fingoal.dev/
+  - type: Postman
+    url: https://fingoal.dev/FinGoal%20Enrichment.postman_collection.json
+  - type: Webhooks
+    url: asyncapi/fingoal-webhooks.yml
+  - type: ErrorCatalog
+    url: errors/fingoal-problem-types.yml
+  - type: DataModel
+    url: data-model/fingoal-data-model.yml
+- aid: fingoal:fingoal-webhook-configurations-api
+  name: FinGoal Webhook Configurations API
+  description: >-
+    Manage webhook callback URLs for your client. Supports default and tenant-specific configurations
+    per webhook type.
+  humanURL: https://docs.fingoal.dev/
+  baseURL: https://findmoney.fingoal.com/v3
+  tags:
+  - Webhook Configurations
+  properties:
+  - type: OpenAPI
+    url: openapi/fingoal-webhook-configurations-api-openapi.yml
+  - type: Documentation
+    url: https://docs.fingoal.dev/
+  - type: APIReference
+    url: https://docs.fingoal.dev/
+  - type: Postman
+    url: https://fingoal.dev/FinGoal%20Enrichment.postman_collection.json
+  - type: Webhooks
+    url: asyncapi/fingoal-webhooks.yml
+  - type: ErrorCatalog
+    url: errors/fingoal-problem-types.yml
+  - type: DataModel
+    url: data-model/fingoal-data-model.yml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: DeveloperPortal
+  url: https://fingoal.com/developer-documentation
+- type: Documentation
+  url: https://docs.fingoal.dev/
+- type: APIReference
+  url: https://docs.fingoal.dev/
+- type: GettingStarted
+  url: https://docs.fingoal.dev/
+- type: Postman
+  url: https://fingoal.dev/FinGoal%20Enrichment.postman_collection.json
+- type: SignUp
+  url: https://fingoal.com/request-developer-account
+- type: Blog
+  url: https://fingoal.com/blog
+- type: GitHubOrganization
+  url: https://github.com/fingoal
+- type: TermsOfService
+  url: https://fingoal.com/terms
+- type: PrivacyPolicy
+  url: https://fingoal.com/privacy
+- type: Compliance
+  url: https://fingoal.com/fingoal-privacy-security
+- type: TrustCenter
+  url: security/fingoal-trust-center.yml
+- type: Authentication
+  url: authentication/fingoal-authentication.yml
+- type: OAuthScopes
+  url: scopes/fingoal-scopes.yml
+- type: Conventions
+  url: conventions/fingoal-conventions.yml
+- type: Lifecycle
+  url: lifecycle/fingoal-lifecycle.yml
+- type: Conformance
+  url: conformance/fingoal-conformance.yml
+- type: Sandbox
+  url: sandbox/fingoal-sandbox.yml
+- type: Webhooks
+  url: asyncapi/fingoal-webhooks.yml
+- type: ErrorCatalog
+  url: errors/fingoal-problem-types.yml
+- type: DataModel
+  url: data-model/fingoal-data-model.yml
+- type: MCPServer
+  url: mcp/fingoal-mcp.yml
+- type: LLMsTxt
+  url: llms/fingoal-llms.txt
+- type: AgentSkill
+  url: skills/_index.yml
+- type: DomainSecurity
+  url: security/fingoal-domain-security.yml
 - type: Website
   url: https://fingoal.com/
+x-enrichment:
+  date: '2026-07-19'
+  status: backfilled
+  pass: local-v1
+  note: backfilled from .gitignore signal + verified work evidence

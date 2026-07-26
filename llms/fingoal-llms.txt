@@ -1,0 +1,41 @@
+# FinGoal
+
+> FinGoal provides financial data insights for banks, credit unions, and fintechs. The Insights API enriches raw transaction data with clean merchant names, categorization, and FinGoal Persona Tags, and pushes updated user tags and enrichment results via webhooks. Authentication is a JWT minted from client_id/client_secret; developer credentials are issued on request.
+
+## APIs
+
+- [Insights API docs](https://docs.fingoal.dev/): Transaction enrichment, user tags, and webhook configuration. Base URLs: https://findmoney-dev.fingoal.com/v3 (dev), https://findmoney.fingoal.com/v3 (prod).
+- [Link Money docs](https://link-money-docs.fingoal.dev/): Account aggregation and verification across 17,000+ financial institutions.
+
+## Specs
+
+- [Insights OpenAPI 3.1 (swagger.json)](https://docs.fingoal.dev/swagger.json): 12 operations across enrichment, users/tags, and webhook-configurations.
+- [Postman collection](https://fingoal.dev/FinGoal%20Enrichment.postman_collection.json): FinGoal Enrichment collection.
+
+## Docs
+
+- [Developer documentation](https://fingoal.com/developer-documentation)
+- [Request a developer account](https://fingoal.com/request-developer-account)
+- [Insights API Tag Registry](https://fingoal.com/tags-list)
+- [Privacy & Security (SOC 2 Type II, GDPR)](https://fingoal.com/fingoal-privacy-security)
+- [Blog](https://fingoal.com/blog)
+
+## Operations
+
+- syncCleanupTransactions - POST /cleanup/sync - Test (synchronous) transaction enrichment
+- asyncCleanupTransactions - POST /cleanup - Historical (async) transaction enrichment
+- streamingCleanupTransactions - POST /cleanup/streaming - Streaming transaction enrichment
+- baseCleanupTransactions - POST /cleanup/base - Base transaction enrichment
+- getEnrichment - GET /cleanup/{batch_request_id} - Retrieve enrichment by batch request id
+- getOneUser - GET /users/{userId} - Get a user
+- getOneUserSync - GET /users/{userId}/sync - Trigger a user tag update
+- getUserTagUpdates - GET /users/tags/{guid} - Retrieve updated tags
+- listWebhookConfigurations - GET /webhook-configurations
+- upsertWebhookConfiguration - PUT /webhook-configurations
+- deleteWebhookConfiguration - DELETE /webhook-configurations
+- testWebhook - POST /webhook-configurations/test
+
+## Authentication
+
+- POST https://findmoney.fingoal.com/v3/authentication with {"client_id","client_secret"} returns a JWT access_token.
+- Send Authorization: Bearer <access_token> on all requests. OAuth2 scopes: enrichment, read, calls_to_action.

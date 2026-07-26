@@ -1,0 +1,25 @@
+generated: '2026-07-19'
+method: searched
+source: https://fingoal.com/fingoal-privacy-security
+url: https://fingoal.com/fingoal-privacy-security
+certifications:
+- SOC 2 Type II
+- GDPR
+programs:
+- Information Security Policy (published PDF)
+- access controls
+- incident management
+- vendor management
+- vulnerability management
+- privacy impact assessments
+data_handling: >-
+  FinGoal states it never transmits or holds a customer's account numbers or
+  passwords, does not hold money for customers, and does not retain highly
+  sensitive data such as SSNs or card numbers; it processes transaction data
+  from authorized consumer accounts.
+evidence:
+- source: https://fingoal.com/fingoal-privacy-security
+  keywords:
+  - soc 2 type ii
+  - gdpr
+  - information security policy

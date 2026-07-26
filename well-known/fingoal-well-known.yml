@@ -1,0 +1,24 @@
+generated: '2026-07-19'
+method: searched
+note: >-
+  Probed the .well-known discovery surface on the API and web hosts. No valid
+  discovery document was served: the findmoney API hosts return 401 for all
+  paths (auth-gated), docs.fingoal.dev is a client-rendered SPA that soft-200s
+  every path (not a real document), and fingoal.com returns 404. No pointer is
+  emitted since nothing real was found.
+probes:
+- host: https://findmoney.fingoal.com
+  path: /.well-known/security.txt
+  status: 401
+- host: https://findmoney.fingoal.com/v3
+  path: /.well-known/openid-configuration
+  status: 401
+- host: https://fingoal.com
+  path: /.well-known/security.txt
+  status: 404
+- host: https://docs.fingoal.dev
+  path: /.well-known/security.txt
+  status: 200
+  valid: false
+  reason: SPA soft-404 (returns the docs HTML shell, not a security.txt)
+documents: []

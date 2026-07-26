@@ -1,0 +1,30 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for FinGoal Insights API
+  version: 1.0.0
+extends: openapi/fingoal-insights-openapi-original.json
+actions:
+- target: $.info
+  update:
+    x-apievangelist-enriched: '2026-07-19'
+    x-apievangelist-artifacts:
+    - authentication/fingoal-authentication.yml
+    - scopes/fingoal-scopes.yml
+    - conventions/fingoal-conventions.yml
+    - errors/fingoal-problem-types.yml
+    - data-model/fingoal-data-model.yml
+    - asyncapi/fingoal-webhooks.yml
+    - conformance/fingoal-conformance.yml
+    - security/fingoal-trust-center.yml
+    - lifecycle/fingoal-lifecycle.yml
+    - sandbox/fingoal-sandbox.yml
+- target: $.info
+  update:
+    x-apievangelist-auth-note: >-
+      Token is minted at POST /v3/authentication with {client_id, client_secret}
+      and returns a JWT used as Authorization: Bearer.
+- target: $.info
+  update:
+    x-apievangelist-webhooks:
+    - ENRICHMENT_DATA
+    - USER_TAGS_DATA

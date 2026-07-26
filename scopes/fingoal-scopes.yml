@@ -1,0 +1,46 @@
+generated: '2026-07-19'
+method: derived
+source: openapi/fingoal-insights-openapi-original.json
+schemes:
+- name: Authentication
+  source: openapi/fingoal-insights-openapi-original.json
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://findmoney.fingoal.com/v3/authentication
+scopes:
+- scope: calls_to_action
+  description: >-
+    Required (with `enrichment`) by GET /users/{userId}/sync to trigger a user
+    tag update / calls-to-action refresh. No standalone description is published
+    in the spec; derived from operation security requirements.
+  used_by:
+  - getOneUserSync
+  sources:
+  - openapi/fingoal-insights-openapi-original.json
+- scope: enrichment
+  description: Grants access to the transaction enrichment APIs.
+  flows:
+  - clientCredentials
+  used_by:
+  - syncCleanupTransactions
+  - asyncCleanupTransactions
+  - streamingCleanupTransactions
+  - baseCleanupTransactions
+  - getEnrichment
+  - getOneUserSync
+  - listWebhookConfigurations
+  - upsertWebhookConfiguration
+  - deleteWebhookConfiguration
+  - testWebhook
+  sources:
+  - openapi/fingoal-insights-openapi-original.json
+- scope: read
+  description: >-
+    Read access to user data. Required by GET /users/{userId} and
+    GET /users/tags/{guid}. No standalone description is published in the spec;
+    derived from operation security requirements.
+  used_by:
+  - getOneUser
+  - getUserTagUpdates
+  sources:
+  - openapi/fingoal-insights-openapi-original.json

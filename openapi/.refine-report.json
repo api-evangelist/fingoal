@@ -1,0 +1,20 @@
+{
+  "provider": "fingoal",
+  "sources": [
+    "fingoal-enrichment-api-openapi.yml",
+    "fingoal-user-tagging-api-openapi.yml",
+    "fingoal-webhook-configurations-api-openapi.yml"
+  ],
+  "outputs": [
+    "fingoal-enrichment-api-openapi.yml",
+    "fingoal-user-tagging-api-openapi.yml",
+    "fingoal-webhook-configurations-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [
+    "fingoal-user-tagging-api-openapi.yml: dangling $ref: #/components/schemas/UsersUserIdGet200Response"
+  ],
+  "warnings": [],
+  "notes": [],
+  "skipped": []
+}

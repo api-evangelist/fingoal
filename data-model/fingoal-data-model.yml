@@ -1,0 +1,63 @@
+generated: '2026-07-19'
+method: derived
+source: openapi/fingoal-insights-openapi-original.json
+docs: https://docs.fingoal.dev/
+entities:
+- name: EnrichmentBatch
+  description: >-
+    A submitted batch of transactions for enrichment, created by the /cleanup*
+    endpoints and identified by batch_request_id.
+  identifier: batch_request_id
+  fields:
+  - transactions_received
+  - transactions_validated
+  - processing
+  - num_transactions_processing
+  - batch_request_id
+- name: Transaction
+  description: A raw transaction submitted in the transactions[] array for enrichment.
+- name: EnrichedTransaction
+  description: >-
+    A cleaned/tagged transaction returned in enrichedTransactions[] (with
+    FinGoal Persona Tags, categorization, and merchant cleanup).
+- name: User
+  description: An end user whose transaction history drives tag generation.
+  identifier: userId
+- name: UserTag
+  description: >-
+    Persona / behavioral tags computed for a user, returned under userTags and
+    delivered via the USER_TAGS_DATA webhook.
+- name: WebhookConfiguration
+  description: >-
+    A registered callback for a given webhook_type (ENRICHMENT_DATA or
+    USER_TAGS_DATA) scoped to a client and optional tenant.
+  identifier: id
+  fields:
+  - id
+  - client_id
+  - tenant_id
+  - webhook_type
+  - callback_url
+  - created_at
+  - updated_at
+relationships:
+- from: EnrichmentBatch
+  to: Transaction
+  type: has_many
+  via: transactions
+- from: EnrichmentBatch
+  to: EnrichedTransaction
+  type: has_many
+  via: enrichedTransactions
+- from: User
+  to: UserTag
+  type: has_many
+  via: userTags
+- from: WebhookConfiguration
+  to: EnrichmentBatch
+  type: references
+  via: batch_request_id (ENRICHMENT_DATA notification payload)
+- from: WebhookConfiguration
+  to: User
+  type: references
+  via: tenant_id (USER_TAGS_DATA notification payload)

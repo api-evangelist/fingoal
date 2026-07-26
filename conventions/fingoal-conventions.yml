@@ -1,0 +1,55 @@
+generated: '2026-07-19'
+method: searched
+source: openapi/fingoal-insights-openapi-original.json
+docs: https://docs.fingoal.dev/
+authentication:
+  style: bearer-jwt
+  detail: >-
+    OAuth2 clientCredentials shape; mint a JWT at POST /v3/authentication with
+    {client_id, client_secret}, then send Authorization: Bearer <jwt>. Some
+    write endpoints additionally require a client_id header.
+  see: authentication/fingoal-authentication.yml
+idempotency:
+  supported: false
+  note: >-
+    No Idempotency-Key header or idempotent-retry contract is documented. Batch
+    enrichment is asynchronous and identified by a server-generated
+    batch_request_id returned on submission.
+pagination:
+  supported: false
+  note: >-
+    No cursor/offset pagination. Enrichment is batch-oriented: submit a
+    transactions array, receive a batch_request_id, then retrieve results by
+    that id or via webhook delivery.
+async_processing:
+  model: batch
+  submit_returns: batch_request_id
+  retrieval:
+  - GET /cleanup/{batch_request_id} (poll)
+  - webhook ENRICHMENT_DATA callback (push)
+  fields:
+  - transactions_received
+  - transactions_validated
+  - processing
+  - num_transactions_processing
+  - batch_request_id
+metadata:
+  supported: false
+error_envelope:
+  shape: >-
+    400 returns an array of per-field/per-transaction validation errors; auth
+    and scope failures return status codes with a short message. Not RFC 9457.
+  see: errors/fingoal-problem-types.yml
+webhooks:
+  supported: true
+  types:
+  - ENRICHMENT_DATA
+  - USER_TAGS_DATA
+  managed_via: /webhook-configurations
+  see: asyncapi/fingoal-webhooks.yml
+rate_limit_signaling:
+  documented: false
+versioning:
+  scheme: uri-path
+  current: v3
+  see: lifecycle/fingoal-lifecycle.yml
