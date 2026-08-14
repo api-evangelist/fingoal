@@ -31,7 +31,7 @@ x-backed-by:
 - techstars
 specificationVersion: '0.20'
 created: '2026-07-17'
-modified: '2026-07-19'
+modified: '2026-08-14'
 tags:
 - Financial Services
 - Fintech
@@ -190,6 +190,48 @@ apis:
     url: errors/fingoal-problem-types.yml
   - type: DataModel
     url: data-model/fingoal-data-model.yml
+- aid: fingoal:fingoal-link-money-api
+  name: FinGoal Link Money API
+  description: >-
+    Link Money is an authentication portal in front of a shared account-aggregation
+    instance. A bank or credit union buys one aggregation environment (a "tenant"),
+    and Link Money authenticates its several fintech partners into that same silo
+    instead of each of them integrating an aggregator separately. Developers mint a
+    tenant-scoped JWT from clientId/clientSecret/tenantId, retrieve Yodlee FastLink 4
+    session details to open the account-linking widget in their own frontend, and
+    register HTTPS webhooks for aggregation events (DATA_UPDATES, REFRESH,
+    AUTO_REFRESH_UPDATES, LATEST_BALANCE_UPDATES, CDV_STATUS_UPDATES, OB_CONSENT,
+    OB_ACTIVE_CONSENT_REMINDER). Beyond the nine described operations the API is a
+    direct proxy to the Yodlee Core API, surfaced unaltered except that the user's
+    loginName moves into a request header. Only a development server is published.
+  humanURL: https://link-money-docs.fingoal.dev/
+  baseURL: https://link-money-dev.fingoal.dev/api
+  tags:
+  - Account Aggregation
+  - Account Verification
+  - Open Banking
+  - Webhooks
+  properties:
+  - type: OpenAPI
+    url: openapi/fingoal-link-money-api-openapi.yml
+  - type: Documentation
+    url: https://link-money-docs.fingoal.dev/
+  - type: APIReference
+    url: https://link-money-docs.fingoal.dev/
+  - type: Overlay
+    url: overlays/fingoal-link-money-overlay.yaml
+  - type: Webhooks
+    url: asyncapi/fingoal-link-money-webhooks.yml
+  - type: Components
+    url: components/fingoal-components.yml
+  - type: Authentication
+    url: authentication/fingoal-authentication.yml
+  - type: DataModel
+    url: data-model/fingoal-data-model.yml
+  - type: RateLimits
+    url: rate-limits/fingoal-rate-limits.yml
+  - type: SignUp
+    url: https://fingoal.com/request-developer-account
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
@@ -248,10 +290,22 @@ common:
   url: skills/_index.yml
 - type: DomainSecurity
   url: security/fingoal-domain-security.yml
+- type: RateLimits
+  url: rate-limits/fingoal-rate-limits.yml
+- type: Components
+  url: components/fingoal-components.yml
+- type: Support
+  url: https://fingoal.com/contact
 - type: Website
   url: https://fingoal.com/
 x-enrichment:
-  date: '2026-07-19'
-  status: backfilled
+  date: '2026-08-14'
+  status: enriched
+  artifacts_added: 11
   pass: local-v1
-  note: backfilled from .gitignore signal + verified work evidence
+  note: >-
+    Discovered and captured a second, previously unprofiled FinGoal API - the
+    Link Money API at https://link-money-docs.fingoal.dev/swagger.json (OpenAPI
+    3.1.0, 9 operations). Confirmed no pricing page, no status page, no
+    changelog, no SDKs, no MCP server and no A2A agent card; those absences are
+    recorded as artifacts rather than omitted.
