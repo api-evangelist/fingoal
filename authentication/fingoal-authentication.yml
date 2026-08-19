@@ -20,9 +20,30 @@ notes: >-
 schemes:
 - name: Authentication
   type: oauth2
+  api: fingoal:fingoal-enrichment-api
   flows:
   - flow: clientCredentials
     tokenUrl: https://findmoney.fingoal.com/v3/authentication
     scopes: 1
   sources:
   - openapi/fingoal-insights-openapi-original.json
+- name: BearerAuth
+  type: oauth2
+  api: fingoal:fingoal-link-money-api
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://link-money-dev.fingoal.dev/api/oauth/token
+    scopes: 1
+    scope_names:
+    - tenantId
+  sources:
+  - openapi/_original/fingoal-link-money-openapi-original.json
+  notes: >-
+    Link Money declares oauth2 clientCredentials but is not RFC 6749 shaped. POST
+    /api/oauth/token takes a JSON body of CAMEL-cased {clientId, clientSecret,
+    tenantId} and returns {token} - not {access_token, token_type, expires_in}.
+    The single declared "scope" is tenantId, which is really a tenancy selector:
+    the JWT is valid for 1 hour and grants access to exactly one tenant, so
+    multi-tenant integrations must mint one token per tenant. Send it as
+    Authorization: Bearer <token>. Tenant access itself is granted out of band -
+    email support@fingoal.com; clients cannot create tenants.

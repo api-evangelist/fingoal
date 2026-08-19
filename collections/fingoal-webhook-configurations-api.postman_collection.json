@@ -1,0 +1,1080 @@
+{
+  "item": [
+    {
+      "id": "4ab9c4fb-430e-4773-9b21-68d746533a58",
+      "name": "Webhook Configurations",
+      "description": {
+        "content": "Manage webhook callback URLs for your client. Supports default and tenant-specific configurations per webhook type.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "7bc9995b-bffe-43fb-a3ab-a9422a76fc91",
+          "name": "List Webhook Configurations",
+          "request": {
+            "name": "List Webhook Configurations",
+            "description": {
+              "content": "Retrieve all webhook configurations for your client. Configurations are organized into:\n- **default**: Configurations without a tenant_id that apply to your client's default callback URL\n- **tenants**: Tenant-specific configurations organized by tenant_id\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "webhook-configurations"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "scope",
+                  "value": "enrichment"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "https://findmoney.fingoal.com/v3/authentication"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "client_credentials"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "6d2ea0e2-27b5-4828-b40e-8fd85ce5f4cc",
+              "name": "Successfully retrieved webhook configurations.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "webhook-configurations"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"webhook_configurations\": {\n    \"client\": [\n      {\n        \"id\": 1,\n        \"client_id\": \"your-client-id\",\n        \"tenant_id\": \"TEN-123456\",\n        \"webhook_type\": \"USER_TAGS_DATA\",\n        \"callback_url\": \"https://your-server.com/webhooks/enrichment\",\n        \"created_at\": \"2024-01-15T10:00:00.000Z\",\n        \"updated_at\": \"2024-01-15T10:00:00.000Z\"\n      },\n      {\n        \"id\": 1,\n        \"client_id\": \"your-client-id\",\n        \"tenant_id\": \"TEN-123456\",\n        \"webhook_type\": \"INSIGHTS\",\n        \"callback_url\": \"https://your-server.com/webhooks/enrichment\",\n        \"created_at\": \"2024-01-15T10:00:00.000Z\",\n        \"updated_at\": \"2024-01-15T10:00:00.000Z\"\n      }\n    ],\n    \"by_tenant\": {\n      \"TEN-123456\": [\n        {\n          \"id\": 2,\n          \"client_id\": \"your-client-id\",\n          \"tenant_id\": \"TEN-123456\",\n          \"webhook_type\": \"ENRICHMENT_DATA\",\n          \"callback_url\": \"https://tenant-specific.com/webhooks/enrichment\",\n          \"created_at\": \"2024-01-15T11:00:00.000Z\",\n          \"updated_at\": \"2024-01-15T11:00:00.000Z\"\n        }\n      ]\n    }\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "b3dedd30-e453-4994-8f3a-445d232d44de",
+              "name": "client_id header is required.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "webhook-configurations"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "551341d7-6b86-4e2d-882e-cbe62aa9fa9f",
+              "name": "Unauthorized.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "webhook-configurations"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "86c7fb7f-b397-4e66-89c7-a4542ee1c2d0",
+              "name": "Missing required `enrichment` scope.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "webhook-configurations"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "0bd7cd7b-e9a1-4d85-bdb0-755ad90fc367",
+          "name": "Create or Update Webhook Configuration",
+          "request": {
+            "name": "Create or Update Webhook Configuration",
+            "description": {
+              "content": "Create a new webhook configuration or update an existing one. Your `client_id` and `tenant_id` are automatically inferred from the bearer token on this request. To set up a webhook for a specific tenant, please ensure that the bearer token on this request as a `tenant_id` claim. If your bearer token lacks a `tenant_id`, the webhook will be created for your single-tenant environment.\n\n- If a configuration already exists for the same client/tenant/webhook_type combination, it will be updated.\n- If `tenant_id` is provided, your client must have a relationship with that tenant.\n- Omit `tenant_id` to set the default callback URL for your client.\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "webhook-configurations"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "PUT",
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "scope",
+                  "value": "enrichment"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "https://findmoney.fingoal.com/v3/authentication"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "client_credentials"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"webhook_type\": \"<string>\",\n  \"callback_url\": \"<uri>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "2a518d6c-65b1-46a3-a4f0-f335ed889694",
+              "name": "Webhook configuration created or updated successfully.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "webhook-configurations"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"webhook_type\": \"ENRICHMENT_NOTIFICATION\",\n  \"callback_url\": \"https://your-server.com/webhooks/enrichment\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"webhook_configuration\": {\n    \"id\": 1,\n    \"client_id\": \"your-client-id\",\n    \"tenant_id\": \"TEN-123456\",\n    \"webhook_type\": \"INSIGHTS\",\n    \"callback_url\": \"https://your-server.com/webhooks/enrichment\",\n    \"created_at\": \"2024-01-15T10:00:00.000Z\",\n    \"updated_at\": \"2024-01-15T10:00:00.000Z\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "bd47958a-4e32-4851-a0fb-560c13dd34c0",
+              "name": "Bad request. Possible errors:\n- `client_id header is required`\n- `webhook_type is required`\n- `Invalid webhook_type`\n- `callback_url is required`\n- `callback_url must be a valid URL`\n",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "webhook-configurations"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"webhook_type\": \"ENRICHMENT_NOTIFICATION\",\n  \"callback_url\": \"https://your-server.com/webhooks/enrichment\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "7497e3f7-4100-4d01-9c97-9e61c4c6b34f",
+              "name": "Unauthorized.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "webhook-configurations"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"webhook_type\": \"ENRICHMENT_NOTIFICATION\",\n  \"callback_url\": \"https://your-server.com/webhooks/enrichment\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "26bf4c56-fa96-4142-8df5-b03caa25e181",
+              "name": "Forbidden. Possible errors:\n- Missing `enrichment` scope\n- Client does not have a relationship with the specified tenant\n",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "webhook-configurations"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"webhook_type\": \"ENRICHMENT_NOTIFICATION\",\n  \"callback_url\": \"https://your-server.com/webhooks/enrichment\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "b22fc828-1083-4ac3-91c3-5391804c874f",
+          "name": "Delete Webhook Configuration",
+          "request": {
+            "name": "Delete Webhook Configuration",
+            "description": {
+              "content": "Remove a webhook configuration.\n\n- Specify `tenant_id` to delete a tenant-specific configuration.\n- Omit `tenant_id` to delete the default configuration.\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "webhook-configurations"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "DELETE",
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "scope",
+                  "value": "enrichment"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "https://findmoney.fingoal.com/v3/authentication"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "client_credentials"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"webhook_type\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "521259db-9c93-4008-b2b0-cc21be5bb298",
+              "name": "Webhook configuration deleted successfully.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "webhook-configurations"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"webhook_type\": \"ENRICHMENT_NOTIFICATION\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"deleted\": true,\n  \"id\": 1\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "37761da3-d15b-40b3-b656-009e97f8dac5",
+              "name": "Bad request. Possible errors:\n- `client_id header is required`\n- `webhook_type is required`\n- `Invalid webhook_type`\n",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "webhook-configurations"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"webhook_type\": \"ENRICHMENT_NOTIFICATION\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "20d78f0c-f6e1-4916-92c6-a218df3e08eb",
+              "name": "Unauthorized.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "webhook-configurations"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"webhook_type\": \"ENRICHMENT_NOTIFICATION\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "58357157-cf1a-4003-a24e-667411146f5f",
+              "name": "Missing required `enrichment` scope.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "webhook-configurations"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"webhook_type\": \"ENRICHMENT_NOTIFICATION\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "83c05a32-a75a-420d-ac33-942996bff4f9",
+              "name": "Webhook configuration not found.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "webhook-configurations"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"webhook_type\": \"ENRICHMENT_NOTIFICATION\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "c4b137cd-cdba-43b6-b4f7-99525fd4c3fa",
+          "name": "Test Webhook",
+          "request": {
+            "name": "Test Webhook",
+            "description": {
+              "content": "Test your webhook endpoint by triggering a sample payload. Useful for verifying your webhook receiver is working correctly.\n\nThe test payload varies by webhook type:\n- **ENRICHMENT_DATA**: Sample enriched transactions payload\n- **ENRICHMENT_NOTIFICATION**: Sample batch notification with batch_request_id\n- **USER_TAGS_DATA**: Sample user tags payload with created/deleted/modified arrays\n- **USER_TAGS_NOTIFICATION**: Sample notification with guid\n- **INSIGHTS**: Sample finsights array\n\nAll test webhooks include the `X-Webhook-Verification` header for signature verification testing.\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "webhook-configurations",
+                "test"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "scope",
+                  "value": "enrichment"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "https://findmoney.fingoal.com/v3/authentication"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "client_credentials"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"webhook_type\": \"<string>\",\n  \"callback_url\": \"<uri>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "495d4b56-b125-4613-a32b-19eb45a31c98",
+              "name": "Test webhook result.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "webhook-configurations",
+                    "test"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"webhook_type\": \"USER_TAGS_DATA\",\n  \"callback_url\": \"https://your-server.com/webhooks/enrichment\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"status\": 200,\n  \"message\": \"Test webhook sent successfully\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "75bc7803-94b0-4777-888c-56c47e26306a",
+              "name": "Bad request. Possible errors:\n- `client_id header is required`\n- `webhook_type is required`\n- `Invalid webhook_type`\n- `callback_url is required`\n- `callback_url must be a valid URL`\n",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "webhook-configurations",
+                    "test"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"webhook_type\": \"USER_TAGS_DATA\",\n  \"callback_url\": \"https://your-server.com/webhooks/enrichment\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "3b697b8c-fd62-4424-80e4-3fdd5934cb30",
+              "name": "Unauthorized.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "webhook-configurations",
+                    "test"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"webhook_type\": \"USER_TAGS_DATA\",\n  \"callback_url\": \"https://your-server.com/webhooks/enrichment\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "a924a2df-e081-4928-87e9-92199f8c044d",
+              "name": "Missing required `enrichment` scope.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "webhook-configurations",
+                    "test"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"webhook_type\": \"USER_TAGS_DATA\",\n  \"callback_url\": \"https://your-server.com/webhooks/enrichment\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://findmoney-dev.fingoal.com/v3",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "oauth2",
+    "oauth2": [
+      {
+        "key": "scope",
+        "value": "enrichment"
+      },
+      {
+        "key": "accessTokenUrl",
+        "value": "https://findmoney.fingoal.com/v3/authentication"
+      },
+      {
+        "key": "grant_type",
+        "value": "client_credentials"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "d60309d9-ec3b-428c-bd51-2fba2f7a6436",
+    "name": "Insights Enrichment Webhook Configurations API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "# Overview\n[Download our postman collection here.](https://fingoal.dev/FinGoal%20Enrichment.postman_collection.json)\n\nThe Insights API provides developers with tools to enhance their transaction, account, and user data with deep enrichment. Although the information returned by the Insights API can be utilized in various ways and implementations may differ, the initial steps for using the API are consistent: \n1. Request a FinGoal developer account.\n2. Obtain API access credentials.\n3. Generate an Insights API authentication token. \n4. Submit transactions to the Insights API. \n5. Register for Webhooks.\n6. Request Enrichment.\n\n## Important Resources\n- [Complete Insights API Tag Registry](https://fingoal.com/tags-list)\n- [Complete Insights API Categorization Spreadsheet](https://docs.google.com/spreadsheets/d/1jnmw1LriclC3bO-oC7f7EkhmfCL7gw2LQLX8zay1vXw/edit?gid=0#gid=0)\n\n## Request a FinGoal Developer Account\nTo use the Insights API, you need authentication credentials. These credentials can be obtained by <a href=\"https://fingoal.com/request-developer-account\" target=\"_blank\"> requesting a FinGoal developer account</a>. FinGoal developer support will send you development environment credentials within 24 hours. These credentials are required for the quickstart. \n# Quickstart\n## Generate a JWT Authentication Token\nAll Insights API endpoints require an `Authorization` header with a `Bearer` token. This token is a JSON Web Token (JWT) generated by the Insights API authentication endpoint. To generate this token, you will need the `client_id` and `client_secret` provided when you requested a FinGoal developer account. \n\n### 1. Prepare the Request Body\nThe request body is a JSON object with the following structure:\n```json\n{\n\t\"client_id\": \"{YOUR_CLIENT_ID}\",\n\t\"client_secret\": \"{YOUR_CLIENT_SECRET}\"\n} \n```\n### 2. Make a POST Request\nMake a POST request to the Insights API authentication endpoint using the prepared JSON object.\n```js\nconst body = {\n  \"client_id\": \"{YOUR_CLIENT_ID}\",\n  \"client_secret\": \"{YOUR_CLIENT_SECRET}\"\n}\n\nconst requestOptions = {\n  method: 'POST',\n  body: body,\n};\n\ntry {\n\tconst response = await fetch(\"https://findmoney-dev.fingoal.com/v3/authentication\", requestOptions);\n  const data = response.json();\n\tconst { access_token } = data;\n\tconsole.log({ access_token });\n} catch(error) {\n\tconsole.log('AUTHENTICATION_ERROR:', error);\n}\n```\nThe JavaScript code above uses the `fetch` API to request an access token. If the request succeeds, it extracts the access_token from the response body. If an error occurs, it logs the error. \n\n### Successful Response\nIf the request is successful, the response body will contain a JSON object with the following structure:\n- `access_token`: The JWT token used to authenticate requests to the Insights API.\n- `scope`: The permissions that the token has.\n- `expires_in`: The number of seconds until the token expires (always 86400 seconds, or 24 hours). \n- `token_type`: The type of token. This value is always `Bearer`.\n```json\n{\n    \"access_token\": \"eyJh...\",\n    \"scope\": \"read:transactions write:transactions ...\",\n    \"expires_in\": 86400,\n    \"token_type\": \"Bearer\"\n}\n```\n### Best Practices \n- Store the `access_token` securely. Do not expose it in client-side code.\n- Use the `expires_in` value to determine when to refresh the token.\n- Regenerate a new token only after the current token has expired.\n\n## Include the JWT Token in Requests\nTo authenticate your requests to the Insights API, you must include the JWT token in the `Authorization` header. The header should have the following structure:\n```json\n{\n  \"Authorization\": \"Bearer {YOUR_ACCESS_TOKEN}\"\n}\n```\nThis header will successfully authenticate any request to the Insights API. You can now proceed to the enrichment, tagging, or savings recommendations quickstarts to integrate the Insights API into your application.\n\n## Tenancy \nInsights API supports the concept of tenancy. A `tenant` refers to a grouping of customer data (users, transactions, tags, accounts, etc.) that may be accessible to multiple clients. By default, a new client’s connection to the InsightsAPI does not use tenancy; however, they may enable tenancy at any time.\n\nCurrently, Insights API does not allow you to create custom tenants. The FinGoal customer support team needs to coordinate with both the client & tenant parties to set up a new connection. If a client’s request for access to a tenant is approved, FinGoal will send the client an identifier for the tenant, and authorize them to access that tenant’s resources. \n\nTo interact with the Insights API on behalf of a tenant, include a tenant_id in your Insights API token request: \n\n```js\nconst response = await fetch(\"{INSIGHTS_API_BASE_URL}/v3/authentication\", {\n\t\tmethod: \"POST\",\n\t\tdata: {\n\t\t\t\tclient_id: \"{MY_CLIENT_ID}\",\n\t\t\t\tclient_secret: \"{MY_CLIENT_SECRET}\",\n\t\t\t\ttenant_id: \"{TENANT_ID_FROM_FINGOAL}\"\n\t\t}\n});\n```\n\nBy including the `tenant_id` in your token scopes, the generated token allows you to: \n\n- Write data to the tenant’s environment.\n- Read data from the tenant’s environment.\n\n<aside>\nIf you do not include a tenant ID, your token will only allow you to access data you have created without a specific tenant association. \n</aside>\n\nAs soon as you are successfully added to a tenant’s data silo, you will begin receiving webhook updates for all activity in that silo. Note that this may include new enrichment data that is added to the environment by clients other than yourself. Refer to the webhook documentation for more information on the content of Insights API webhooks.",
+      "type": "text/plain"
+    }
+  }
+}

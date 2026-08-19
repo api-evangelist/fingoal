@@ -1,24 +1,106 @@
-generated: '2026-07-19'
-method: searched
+generated: '2026-08-14'
+method: probed
+source: live HTTP probes of every apis.yml host, every OpenAPI servers[] host, and both docs hosts
 note: >-
-  Probed the .well-known discovery surface on the API and web hosts. No valid
-  discovery document was served: the findmoney API hosts return 401 for all
-  paths (auth-gated), docs.fingoal.dev is a client-rendered SPA that soft-200s
-  every path (not a real document), and fingoal.com returns 404. No pointer is
-  emitted since nothing real was found.
+  Re-probed the .well-known discovery surface across all six FinGoal hosts,
+  including the fingoal.dev hosts added with the Link Money API this round. No
+  valid discovery document is served anywhere. Three distinct failure shapes,
+  and none of them is a hit: the findmoney API hosts return 401 on every path
+  (auth-gated at the edge, so nothing is anonymously discoverable);
+  fingoal.com returns a 404 whose body literally reads "Invalid .well-known
+  request"; and the two docs hosts (docs.fingoal.dev,
+  link-money-docs.fingoal.dev) are client-rendered SPAs that answer 200 with the
+  same HTML documentation shell for EVERY /.well-known/* path - a soft-200, not
+  a document. No WellKnown, SecurityTxt, or AgentCard pointer is emitted,
+  because the provider serves none of those surfaces.
 probes:
-- host: https://findmoney.fingoal.com
-  path: /.well-known/security.txt
-  status: 401
-- host: https://findmoney.fingoal.com/v3
-  path: /.well-known/openid-configuration
-  status: 401
 - host: https://fingoal.com
   path: /.well-known/security.txt
   status: 404
+- host: https://fingoal.com
+  path: /.well-known/openid-configuration
+  status: 404
+- host: https://fingoal.com
+  path: /.well-known/oauth-authorization-server
+  status: 404
+- host: https://fingoal.com
+  path: /.well-known/api-catalog
+  status: 404
+- host: https://fingoal.com
+  path: /.well-known/ai-plugin.json
+  status: 404
+- host: https://fingoal.com
+  path: /.well-known/agent-card.json
+  status: 404
+- host: https://fingoal.com
+  path: /.well-known/agent.json
+  status: 404
+- host: https://findmoney.fingoal.com
+  path: /.well-known/security.txt
+  status: 401
+- host: https://findmoney.fingoal.com
+  path: /.well-known/agent-card.json
+  status: 401
+- host: https://findmoney.fingoal.com
+  path: /.well-known/agent.json
+  status: 401
 - host: https://docs.fingoal.dev
   path: /.well-known/security.txt
   status: 200
   valid: false
-  reason: SPA soft-404 (returns the docs HTML shell, not a security.txt)
+  reason: SPA soft-200 (returns the docs HTML shell, not a security.txt)
+- host: https://docs.fingoal.dev
+  path: /.well-known/agent-card.json
+  status: 200
+  valid: false
+  reason: SPA soft-200 (returns the docs HTML shell, not an AgentCard JSON object)
+- host: https://link-money-docs.fingoal.dev
+  path: /.well-known/security.txt
+  status: 200
+  valid: false
+  reason: SPA soft-200 (same HTML shell on every path)
+- host: https://link-money-docs.fingoal.dev
+  path: /.well-known/openid-configuration
+  status: 200
+  valid: false
+  reason: SPA soft-200
+- host: https://link-money-docs.fingoal.dev
+  path: /.well-known/oauth-authorization-server
+  status: 200
+  valid: false
+  reason: SPA soft-200
+- host: https://link-money-docs.fingoal.dev
+  path: /.well-known/oauth-protected-resource
+  status: 200
+  valid: false
+  reason: SPA soft-200
+- host: https://link-money-docs.fingoal.dev
+  path: /.well-known/agent-card.json
+  status: 200
+  valid: false
+  reason: SPA soft-200
+- host: https://link-money.fingoal.dev
+  path: /.well-known/security.txt
+  status: 404
+- host: https://link-money.fingoal.dev
+  path: /.well-known/oauth-authorization-server
+  status: 404
+- host: https://link-money.fingoal.dev
+  path: /.well-known/oauth-protected-resource
+  status: 404
+- host: https://link-money.fingoal.dev
+  path: /.well-known/agent-card.json
+  status: 404
+- host: https://link-money.fingoal.dev
+  path: /.well-known/agent.json
+  status: 404
+- host: https://fingoal.dev
+  path: /.well-known/security.txt
+  status: 404
+- host: https://fingoal.dev
+  path: /.well-known/agent-card.json
+  status: 404
+- host: https://fingoal.dev
+  path: /.well-known/agent.json
+  status: 404
 documents: []

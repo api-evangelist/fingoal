@@ -1,0 +1,65 @@
+generated: '2026-08-14'
+method: searched
+source: https://link-money-docs.fingoal.dev/swagger.json
+docs: https://link-money-docs.fingoal.dev/
+note: >-
+  FinGoal ships one client-side embeddable surface, and it belongs to Link Money
+  rather than the Insights API: the Yodlee FastLink 4 account-linking widget,
+  opened in an iframe from the developer's own frontend. FinGoal does not author
+  or host the widget - it mints the per-user session for it. The Link Money API
+  operation getFastlinkFourDetails (POST /yodlee/fastlink/get) returns an
+  `accessToken` and a tenant-specific `fastLinkURL`, which the developer passes
+  to Yodlee's loader script. Everything here is quoted from FinGoal's own Link
+  Money documentation; no component is invented, and the Insights API publishes
+  no embeddable UI at all.
+families:
+- name: Account Linking
+  product: Link Money
+  components:
+  - name: Yodlee FastLink 4 widget
+    kind: hosted-iframe-widget
+    first_party: false
+    vendor: Yodlee
+    loader: https://cdn.yodlee.com/fastlink/v4/initialize.js
+    loader_pinned: false
+    loader_note: >-
+      The loader URL is version-pinned to the FastLink major (v4) but not to a
+      build; a consumer cannot tell which build they are getting. FinGoal
+      documents the script tag verbatim in the Link Money quickstart.
+    open_api: >-
+      window.fastlink.open({ fastLinkURL, accessToken, params: { configName },
+      onSuccess, onError, onClose, onEvent }, 'container-fastlink')
+    session_source:
+      operation: getFastlinkFourDetails
+      endpoint: POST /yodlee/fastlink/get
+      returns:
+      - accessToken
+      - fastLinkURL
+    configurations:
+    - name: aggregation
+      purpose: mandatory account aggregation
+    - name: verification
+      purpose: mandatory account verification
+    - name: aggregation_and_verification
+      purpose: mandatory account aggregation and optional account verification
+    - name: verification_and_aggregation
+      purpose: mandatory account verification and optional account aggregation
+    callbacks:
+    - onSuccess
+    - onError
+    - onClose
+    - onEvent
+    limitation: >-
+      "Some functionality, like Fastlink Configuration, may not be available to
+      you through Link Money."
+    vendor_docs: https://developer.yodlee.com/resources/yodlee/fastlink-4/docs/documentation
+insights_api_components: []
+insights_api_note: >-
+  The Insights API is a server-to-server batch enrichment API. It publishes no
+  web components, element library, hosted checkout, or embedded dashboard.
+evidence:
+- url: https://link-money-docs.fingoal.dev/swagger.json
+  status: 200
+- url: https://fingoal.com/developer-faqs
+  status: 200
+  finding: documents the four FastLink 4 configName options

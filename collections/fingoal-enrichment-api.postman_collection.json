@@ -1,0 +1,1105 @@
+{
+  "item": [
+    {
+      "id": "2bfd1b99-59f1-4f7d-bee7-f1922ec45cac",
+      "name": "Enrichment",
+      "description": {
+        "content": "The Insights API's transaction enrichment endpoints enable developers to clean and enhance their transaction data. This process includes standardizing merchant names, categorizing transactions, and adding additional metadata. It also supports transaction-level tagging. Transactions submitted to the enrichment endpoints contribute to the Insights API's user tagging capabilities. \n\nThe Insights API offers both synchronous and asynchronous flows. The synchronous flow is a direct request-response model intended for testing and development purposes only. All production requests should use the asynchronous historical and streaming transaction enrichment endpoints.\n\n<a href=\"https://docs.google.com/spreadsheets/d/1XL649eKzMZ21WGWdcUE4cvKbKb6oXzfdBv5Ob8qPpbM/edit?usp=sharing\" target=\"blank\">View Full List of FinGoal Categories</a>\n\n<a href=\"https://fingoal.com/tags-list\" target=\"blank\">View Full List of FinGoal Tags</a>\n\n\n## Enrichment Quickstart\nThis quickstart requires a JWT, which can be generated following the top-level authentication quickstart. Ensure you have a valid JWT before proceeding.\n\n### 1. Prepare the Request Body\nThe request body should be a JSON object with a single parameter, `transactions`, which must be an array. Each transaction must include the following fields:\n- `uid`: A unique user identifier.\n- `amountnum`: The transaction amount.\n- `date`: The transaction date.\n- `original_description`: The original transaction description.\n- `transactionid`: The unique transaction identifier.\n- `accountType`: The account type.\n- `settlement`: The settlement type.\n\n```json\n{\n  \"transactions\": [\n    {\n      \"uid\": \"16432789fdsa78\",\n      \"accountid\": \"1615\",\n      \"amountnum\": 12.41,\n      \"date\": \"2024-05-11\",\n      \"original_description\": \"T0064 TARGET STORE\",\n      \"transactionid\": \"988cee06-5d36-11ec-b00b-bc8d8f2303a12733\",\n      \"accountType\" : \"creditCard\",\n      \"settlement\": \"debit\"\n    }\n  ]\n}\n```\n### 2. Make a POST Request\nMake a POST request to the Insights API cleanup endpoint using the prepared JSON object. Include the JWT in the `Authorization` header.\n```js\n  const headers = new Headers();\n  headers.append(\"Authorization\", \"Bearer {YOUR_TOKEN}\");\n  headers.append(\"Content-Type\", \"application/json\");\n\n  const body = JSON.stringify({\n    \"transactions\": [\n      {\n        \"uid\": \"16432789fdsa78\",\n        \"accountid\": \"1615\",\n        \"amountnum\": 12.41,\n        \"date\": \"2024-05-11\",\n        \"original_description\": \"T0064 TARGET STORE\",\n        \"transactionid\": \"988cee06-5d36-11ec-b00b-bc8d8f2303a12733\",\n        \"accountType\" : \"creditCard\",\n        \"settlement\": \"debit\"\n      }\n    ]\n  });\n\n  const requestOptions = {\n    method: 'POST',\n    redirect: 'follow'\n    headers,\n    body,\n  };\n\n  try {\n    const response = await fetch(\"https://findmoney-dev.fingoal.com/v3/cleanup\", requestOptions);\n    const data = response.json();\n    console.log(data);\n  } catch(error) {\n    console.log('ERROR:', error);\n  }\n```\nThe JavaScript code above uses the `fetch` API to request transaction enrichment. If the request succeeds, it logs the response body. If an error occurs, it logs the error.\n### 3. Extract the Batch Request ID from a Successful Response\nIf the request is successful, the response body will contain a JSON object with a single parameter, `status`. The `status` object has the following structure:\n- `transactions_received`: Whether or not the transactions were successfully enqueued for enrichment.\n- `transactions_validated`: Whether or not the transactions were successfully validated.\n- `processing`: Whether or not the transactions are currently being processed.\n- `num_transactions_processing`: The number of transactions that are currently being processed.\n- `batch_request_id`: The unique identifier for the batch request.\n\n```json\n{\n  \"status\": {\n    \"transactions_received\": true,\n    \"transactions_validated\": true,\n    \"processing\": true,\n    \"num_transactions_processing\": 1,\n    \"batch_request_id\": \"988cee06-5d36-11ec-b00b-bc8d8f2303a12733\"\n  }\n}\n```\nThe `batch_request_id` is a unique identifier for the batch request. You will use this identifier to retrieve the enriched transactions. \n### 4. Listen for the Enrichment Completion Event \nTo receive a webhook notification for a completed enrichment batch, you must submit a webhook URL. Use the FinGoal support email (support@fingoal.com) to submit a webhook URL for registry. Once the URL is registered, you will automatically receive all future enrichment completion webhooks. \n\nWebhook notifications are sent as HTTP POST requests to the registered URL. The webhook URL must be publicly accessible and support HTTPS connections. The Insights API cannot send webhooks to a non-HTTPS URL. \n\nThe webhook payload contains a JSON object with the following structure: \n- `batch_request_id`: The unique identifier for the batch request.\n\nThe `batch_request_id` corresponds to the `batch_request_id` returned in the initial enrichment request. \n```json\n{\n  \"batch_request_id\": \"988cee06-5d36-11ec-b00b-bc8d8f2303a12733\"\n}\n```\n#### Verifying the Enrichment Webhook \nEvery enrichment complete webhook includes an `X-Webhook-Verification` header. The header contains a SHA-256 HMAC signature of the webhook payload. To verify the webhook, you must generate a SHA-256 HMAC signature using the webhook payload and your Insights API secret key. If the generated signature matches the signature in the `X-Webhook-Verification` header, the webhook is valid. If not, the webhook should be discarded. \n\nThe following snippet demonstrates how to verify the webhook signature using Node.js with the `crypto` and `express` libraries.\n```js\nconst crypto = require('crypto');\nconst express = require('express');\nconst app = express();\n\napp.use(express.json());\napp.post('/webhook-receiver', (req, res) => {\n  const { headers, body } = req;\n  const { 'x-webhook-verification': signature } = headers;\n  if (!signature) {\n    res.status(400).send('Reject the webhook if no verification header is present.');\n    return;\n  }\n\n  const secret = 'YOUR_CLIENT_SECRET';\n  const payload = JSON.stringify(body);\n  const hmac = crypto.createHmac('sha256', secret);\n  const digest = hmac.update(payload).digest('hex');\n\n  if (digest === signature) {\n    res.status(200).send('The webhook is verified. It is safe to process the payload.'); \n  } else {\n    res.status(400).send('The Webhook verification is incorrect for the payload. Reject the webhook.');\n  }\n});\n```\n\n### 5. Retrieve the Enriched Transactions\nWith the `batch_request_id`, submit a GET request to the Insights API enrichment retrieval endpoint. Include the JWT in the `Authorization` header. \n```js\n  const headers = new Headers();\n  headers.append(\"Authorization\", \"Bearer {YOUR_TOKEN}\");\n\n  const requestOptions = {\n    method: 'GET',\n    redirect: 'follow',\n    headers,\n  };\n\n  try {\n    const response = await fetch(\"https://findmoney-dev.fingoal.com/v3/cleanup/{batch_request_id}\", requestOptions);\n    const data = response.json();\n    console.log(data);\n  } catch(error) {\n    console.log('ERROR:', error);\n  }\n```\nThe JavaScript code above uses the `fetch` API to request the enriched transactions. If the request succeeds, it logs the response body. If an error occurs, it logs the error.\n### Successful Response\nIf the request is successful, the response body will contain a JSON object a single parameter, `enrichedTransactions`. The `enrichedTransactions` array will contain all available transaction-level enrichment for the data in this batch. \n\n### Best Practices \n- Group transactions by `uid` for optimal performance. \n- Provide as much information as possible in the request body to improve enrichment quality.\n- Use unique `uid` and `transactionid` values for each user and transaction. These identifiers may need to be cross-referenced with your system's data in the future.\n- Avoid using personally identifiable information (PII) in the `uid` or `transactionid` fields. We recommend using a UUID or similar anonymous identifier instead. \n",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "8251f91a-89ae-4f5d-a160-bd07389730d6",
+          "name": "Test Transaction Enrichment",
+          "request": {
+            "name": "Test Transaction Enrichment",
+            "description": {
+              "content": "The test transaction enrichment endpoint provides immediate enrichment on transaction data. This endpoint is ideal for testing API functionality and previewing enrichment results. \n\n**This endpoint is not intended for production use.** Use the historical and streaming endpoints for production-level enrichment.\n\n\nFor optimal performance, adhere to the following limits: \n  - Submit no more than 4 unique users per request. Users are distinguished by the `uid` field in each transaction. \n  - Submit no more than 16 transactions per user per request if sending multiple users. Send no more than 128 if sending a single user.\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "cleanup",
+                "sync"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "scope",
+                  "value": "enrichment"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "https://findmoney.fingoal.com/v3/authentication"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "client_credentials"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"transactions\": [\n    {\n      \"accountType\": \"<string>\",\n      \"amountnum\": \"<number>\",\n      \"date\": \"<date>\",\n      \"original_description\": \"<string>\",\n      \"transactionid\": \"<string>\",\n      \"settlement\": \"<string>\",\n      \"uid\": \"<string>\",\n      \"identifiers\": {\n        \"sfmc_contact_id\": \"<string>\",\n        \"banno_end_user_id\": \"<string>\"\n      },\n      \"accountid\": \"<string>\"\n    },\n    {\n      \"accountType\": \"<string>\",\n      \"amountnum\": \"<number>\",\n      \"date\": \"<date>\",\n      \"original_description\": \"<string>\",\n      \"transactionid\": \"<string>\",\n      \"settlement\": \"<string>\",\n      \"uid\": \"<string>\",\n      \"identifiers\": {\n        \"sfmc_contact_id\": \"<string>\",\n        \"banno_end_user_id\": \"<string>\"\n      },\n      \"accountid\": \"<string>\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "f29926f0-9099-4ea2-9a0e-b207ab06fb1b",
+              "name": "Success",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "cleanup",
+                    "sync"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"transactions\": [\n    {\n      \"accountType\": \"checking\",\n      \"amountnum\": 19.99,\n      \"date\": \"2024-05-01\",\n      \"original_description\": \"Cottonwood Supermarket & Deli\",\n      \"transactionid\": \"178b1f61-dafe-4d47-837b-54ce34dc82b2\",\n      \"settlement\": \"debit\",\n      \"uid\": \"user123\",\n      \"identifiers\": {\n        \"sfmc_contact_id\": \"sfmc-1234\",\n        \"banno_end_user_id\": \"banno-1234\"\n      },\n      \"accountid\": \"account456\"\n    },\n    {\n      \"accountType\": \"checking\",\n      \"amountnum\": 19.99,\n      \"date\": \"2024-05-01\",\n      \"original_description\": \"Cottonwood Supermarket & Deli\",\n      \"transactionid\": \"178b1f61-dafe-4d47-837b-54ce34dc82b2\",\n      \"settlement\": \"debit\",\n      \"uid\": \"user123\",\n      \"identifiers\": {\n        \"sfmc_contact_id\": \"sfmc-1234\",\n        \"banno_end_user_id\": \"banno-1234\"\n      },\n      \"accountid\": \"account456\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"enrichedTransactions\": {\n    \"enriched\": [\n      {\n        \"accountid\": \"string\",\n        \"amountnum\": 6594.749499029897,\n        \"category\": \"string\",\n        \"categoryId\": 1568.8301353482414,\n        \"categoryLabel\": [\n          \"string\",\n          \"string\"\n        ],\n        \"client_id\": \"string\",\n        \"container\": \"string\",\n        \"date\": \"1972-08-10T21:00:06.674Z\",\n        \"detailCategoryId\": 8862.185321606383,\n        \"guid\": \"string\",\n        \"highLevelCategoryId\": 7020.186419032083,\n        \"isPhysical\": false,\n        \"isRecurring\": false,\n        \"merchantAddress1\": \"string\",\n        \"merchantCity\": \"string\",\n        \"merchantCountry\": \"string\",\n        \"merchantLatitude\": \"string\",\n        \"merchantLogoURL\": \"string\",\n        \"merchantLongitude\": \"string\",\n        \"merchantName\": \"string\",\n        \"merchantPhoneNumber\": \"string\",\n        \"merchantState\": \"string\",\n        \"merchantType\": \"string\",\n        \"merchantZip\": \"string\",\n        \"original_description\": \"string\",\n        \"receiptDate\": \"1986-03-30T22:23:52.794Z\",\n        \"requestId\": \"string\",\n        \"simple_description\": \"string\",\n        \"simpleDescription\": \"string\",\n        \"sourceId\": \"string\",\n        \"subType\": \"string\",\n        \"tenant_id\": \"string\",\n        \"transactionid\": \"string\",\n        \"transactionTags\": [\n          \"string\",\n          \"string\"\n        ],\n        \"type\": \"string\",\n        \"uid\": \"string\"\n      },\n      {\n        \"accountid\": \"string\",\n        \"amountnum\": 7893.963705450456,\n        \"category\": \"string\",\n        \"categoryId\": 6015.444817205586,\n        \"categoryLabel\": [\n          \"string\",\n          \"string\"\n        ],\n        \"client_id\": \"string\",\n        \"container\": \"string\",\n        \"date\": \"1958-08-30T17:38:56.230Z\",\n        \"detailCategoryId\": 206.0119346273981,\n        \"guid\": \"string\",\n        \"highLevelCategoryId\": 1758.0068402425818,\n        \"isPhysical\": true,\n        \"isRecurring\": false,\n        \"merchantAddress1\": \"string\",\n        \"merchantCity\": \"string\",\n        \"merchantCountry\": \"string\",\n        \"merchantLatitude\": \"string\",\n        \"merchantLogoURL\": \"string\",\n        \"merchantLongitude\": \"string\",\n        \"merchantName\": \"string\",\n        \"merchantPhoneNumber\": \"string\",\n        \"merchantState\": \"string\",\n        \"merchantType\": \"string\",\n        \"merchantZip\": \"string\",\n        \"original_description\": \"string\",\n        \"receiptDate\": \"2002-05-17T11:28:20.704Z\",\n        \"requestId\": \"string\",\n        \"simple_description\": \"string\",\n        \"simpleDescription\": \"string\",\n        \"sourceId\": \"string\",\n        \"subType\": \"string\",\n        \"tenant_id\": \"string\",\n        \"transactionid\": \"string\",\n        \"transactionTags\": [\n          \"string\",\n          \"string\"\n        ],\n        \"type\": \"string\",\n        \"uid\": \"string\"\n      }\n    ],\n    \"failed\": [\n      {\n        \"amountnum\": 5392.3850400055735,\n        \"settlement\": \"string\",\n        \"original_description\": \"string\",\n        \"transactionid\": \"string\",\n        \"date\": \"1986-01-23T08:48:54.694Z\",\n        \"accountType\": \"string\",\n        \"uid\": \"string\",\n        \"error_message\": \"string\"\n      },\n      {\n        \"amountnum\": 6227.165846728408,\n        \"settlement\": \"string\",\n        \"original_description\": \"string\",\n        \"transactionid\": \"string\",\n        \"date\": \"2021-04-28T07:31:16.808Z\",\n        \"accountType\": \"string\",\n        \"uid\": \"string\",\n        \"error_message\": \"string\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "693c8c33-178b-426a-abe6-b59ac62b268a",
+              "name": "Bad request. An array of errors in the data will be returned. Fields not allowed or incorrectly formatted will be noted.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "cleanup",
+                    "sync"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"transactions\": [\n    {\n      \"accountType\": \"checking\",\n      \"amountnum\": 19.99,\n      \"date\": \"2024-05-01\",\n      \"original_description\": \"Cottonwood Supermarket & Deli\",\n      \"transactionid\": \"178b1f61-dafe-4d47-837b-54ce34dc82b2\",\n      \"settlement\": \"debit\",\n      \"uid\": \"user123\",\n      \"identifiers\": {\n        \"sfmc_contact_id\": \"sfmc-1234\",\n        \"banno_end_user_id\": \"banno-1234\"\n      },\n      \"accountid\": \"account456\"\n    },\n    {\n      \"accountType\": \"checking\",\n      \"amountnum\": 19.99,\n      \"date\": \"2024-05-01\",\n      \"original_description\": \"Cottonwood Supermarket & Deli\",\n      \"transactionid\": \"178b1f61-dafe-4d47-837b-54ce34dc82b2\",\n      \"settlement\": \"debit\",\n      \"uid\": \"user123\",\n      \"identifiers\": {\n        \"sfmc_contact_id\": \"sfmc-1234\",\n        \"banno_end_user_id\": \"banno-1234\"\n      },\n      \"accountid\": \"account456\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "ac9a0ffe-5515-443c-bc50-388a74b1e1ac",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "cleanup",
+                    "sync"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"transactions\": [\n    {\n      \"accountType\": \"checking\",\n      \"amountnum\": 19.99,\n      \"date\": \"2024-05-01\",\n      \"original_description\": \"Cottonwood Supermarket & Deli\",\n      \"transactionid\": \"178b1f61-dafe-4d47-837b-54ce34dc82b2\",\n      \"settlement\": \"debit\",\n      \"uid\": \"user123\",\n      \"identifiers\": {\n        \"sfmc_contact_id\": \"sfmc-1234\",\n        \"banno_end_user_id\": \"banno-1234\"\n      },\n      \"accountid\": \"account456\"\n    },\n    {\n      \"accountType\": \"checking\",\n      \"amountnum\": 19.99,\n      \"date\": \"2024-05-01\",\n      \"original_description\": \"Cottonwood Supermarket & Deli\",\n      \"transactionid\": \"178b1f61-dafe-4d47-837b-54ce34dc82b2\",\n      \"settlement\": \"debit\",\n      \"uid\": \"user123\",\n      \"identifiers\": {\n        \"sfmc_contact_id\": \"sfmc-1234\",\n        \"banno_end_user_id\": \"banno-1234\"\n      },\n      \"accountid\": \"account456\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "c0e7cd34-3d63-4d26-86ba-4fdd355517f2",
+          "name": "Historical Transaction Enrichment",
+          "request": {
+            "name": "Historical Transaction Enrichment",
+            "description": {
+              "content": "The historical transaction enrichment endpoint is designed for enriching a large number of transactions. It is optimized to handle substantial payloads and efficiently process large backlogs of data.\n\nThis endpoint is asynchronous. A webhook will be sent to the provided URL when a batch of transactions has been enriched.\n    \nTo maximize throughput for this endpoint, follow these guidelines: \n  - Group transactions by `uid` and include all transactions for a single `uid` in the same payload.\n  - Limit each request to approximately 1,000 transactions. The payload can include multiple uids. \n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "cleanup"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "scope",
+                  "value": "enrichment"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "https://findmoney.fingoal.com/v3/authentication"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "client_credentials"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"transactions\": [\n    {\n      \"accountType\": \"<string>\",\n      \"amountnum\": \"<number>\",\n      \"date\": \"<date>\",\n      \"original_description\": \"<string>\",\n      \"transactionid\": \"<string>\",\n      \"settlement\": \"<string>\",\n      \"uid\": \"<string>\",\n      \"identifiers\": {\n        \"sfmc_contact_id\": \"<string>\",\n        \"banno_end_user_id\": \"<string>\"\n      },\n      \"accountid\": \"<string>\"\n    },\n    {\n      \"accountType\": \"<string>\",\n      \"amountnum\": \"<number>\",\n      \"date\": \"<date>\",\n      \"original_description\": \"<string>\",\n      \"transactionid\": \"<string>\",\n      \"settlement\": \"<string>\",\n      \"uid\": \"<string>\",\n      \"identifiers\": {\n        \"sfmc_contact_id\": \"<string>\",\n        \"banno_end_user_id\": \"<string>\"\n      },\n      \"accountid\": \"<string>\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "3b6b8215-9afe-4ed6-b975-17736d3d22fa",
+              "name": "Success",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "cleanup"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"transactions\": [\n    {\n      \"accountType\": \"checking\",\n      \"amountnum\": 19.99,\n      \"date\": \"2024-05-01\",\n      \"original_description\": \"Cottonwood Supermarket & Deli\",\n      \"transactionid\": \"178b1f61-dafe-4d47-837b-54ce34dc82b2\",\n      \"settlement\": \"debit\",\n      \"uid\": \"user123\",\n      \"identifiers\": {\n        \"sfmc_contact_id\": \"sfmc-1234\",\n        \"banno_end_user_id\": \"banno-1234\"\n      },\n      \"accountid\": \"account456\"\n    },\n    {\n      \"accountType\": \"checking\",\n      \"amountnum\": 19.99,\n      \"date\": \"2024-05-01\",\n      \"original_description\": \"Cottonwood Supermarket & Deli\",\n      \"transactionid\": \"178b1f61-dafe-4d47-837b-54ce34dc82b2\",\n      \"settlement\": \"debit\",\n      \"uid\": \"user123\",\n      \"identifiers\": {\n        \"sfmc_contact_id\": \"sfmc-1234\",\n        \"banno_end_user_id\": \"banno-1234\"\n      },\n      \"accountid\": \"account456\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"transactions_received\": false,\n  \"transactions_validated\": true,\n  \"processing\": true,\n  \"num_transactions_processing\": 3798,\n  \"batch_request_id\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "66dd046f-4dad-4d34-9d8c-77d898603db8",
+              "name": "Bad request. An array of errors in the data will be returned. Fields not allowed or incorrectly formatted will be noted.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "cleanup"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"transactions\": [\n    {\n      \"accountType\": \"checking\",\n      \"amountnum\": 19.99,\n      \"date\": \"2024-05-01\",\n      \"original_description\": \"Cottonwood Supermarket & Deli\",\n      \"transactionid\": \"178b1f61-dafe-4d47-837b-54ce34dc82b2\",\n      \"settlement\": \"debit\",\n      \"uid\": \"user123\",\n      \"identifiers\": {\n        \"sfmc_contact_id\": \"sfmc-1234\",\n        \"banno_end_user_id\": \"banno-1234\"\n      },\n      \"accountid\": \"account456\"\n    },\n    {\n      \"accountType\": \"checking\",\n      \"amountnum\": 19.99,\n      \"date\": \"2024-05-01\",\n      \"original_description\": \"Cottonwood Supermarket & Deli\",\n      \"transactionid\": \"178b1f61-dafe-4d47-837b-54ce34dc82b2\",\n      \"settlement\": \"debit\",\n      \"uid\": \"user123\",\n      \"identifiers\": {\n        \"sfmc_contact_id\": \"sfmc-1234\",\n        \"banno_end_user_id\": \"banno-1234\"\n      },\n      \"accountid\": \"account456\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "7868977b-0803-4af9-a872-a0272f8caf12",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "cleanup"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"transactions\": [\n    {\n      \"accountType\": \"checking\",\n      \"amountnum\": 19.99,\n      \"date\": \"2024-05-01\",\n      \"original_description\": \"Cottonwood Supermarket & Deli\",\n      \"transactionid\": \"178b1f61-dafe-4d47-837b-54ce34dc82b2\",\n      \"settlement\": \"debit\",\n      \"uid\": \"user123\",\n      \"identifiers\": {\n        \"sfmc_contact_id\": \"sfmc-1234\",\n        \"banno_end_user_id\": \"banno-1234\"\n      },\n      \"accountid\": \"account456\"\n    },\n    {\n      \"accountType\": \"checking\",\n      \"amountnum\": 19.99,\n      \"date\": \"2024-05-01\",\n      \"original_description\": \"Cottonwood Supermarket & Deli\",\n      \"transactionid\": \"178b1f61-dafe-4d47-837b-54ce34dc82b2\",\n      \"settlement\": \"debit\",\n      \"uid\": \"user123\",\n      \"identifiers\": {\n        \"sfmc_contact_id\": \"sfmc-1234\",\n        \"banno_end_user_id\": \"banno-1234\"\n      },\n      \"accountid\": \"account456\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "17793c3d-bdff-4eb1-b0e7-31e24396aaf3",
+          "name": "Streaming Transaction Enrichment",
+          "request": {
+            "name": "Streaming Transaction Enrichment",
+            "description": {
+              "content": "FinGoal's streaming transaction enrichment endpoint is designed for enriching daily user transactions or other smaller transaction batches. \n\nUnlike the historical transaction enrichment endpoint, the streaming transaction enrichment endpoint does not require any user segmentation. Requests that include many users (by uid) will not deteriorate the endpoint's performance.\n\nThis endpoint is asynchronous. A webhook will be sent to the provided URL when a batch of transactions has been enriched. For larger transaction sets, such as historical data, user the historical enrichment endpoint.\n\nTo maximize throughput for this endpoint, follow these guidelines: \n  - Group transactions by \"uid\" and include all transactions for a single user in the same payload.\n  - Limit each request to a total of approximately 1,000 transactions. \n  - Transactions can be distributed among any number of users as long as the total number of transactions does not exceed 1,000.\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "cleanup",
+                "streaming"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "scope",
+                  "value": "enrichment"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "https://findmoney.fingoal.com/v3/authentication"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "client_credentials"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"transactions\": [\n    {\n      \"accountType\": \"<string>\",\n      \"amountnum\": \"<number>\",\n      \"date\": \"<date>\",\n      \"original_description\": \"<string>\",\n      \"transactionid\": \"<string>\",\n      \"settlement\": \"<string>\",\n      \"uid\": \"<string>\",\n      \"identifiers\": {\n        \"sfmc_contact_id\": \"<string>\",\n        \"banno_end_user_id\": \"<string>\"\n      },\n      \"accountid\": \"<string>\"\n    },\n    {\n      \"accountType\": \"<string>\",\n      \"amountnum\": \"<number>\",\n      \"date\": \"<date>\",\n      \"original_description\": \"<string>\",\n      \"transactionid\": \"<string>\",\n      \"settlement\": \"<string>\",\n      \"uid\": \"<string>\",\n      \"identifiers\": {\n        \"sfmc_contact_id\": \"<string>\",\n        \"banno_end_user_id\": \"<string>\"\n      },\n      \"accountid\": \"<string>\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "1818c349-e1fc-4150-8f14-8f8c30c5a73a",
+              "name": "Success",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "cleanup",
+                    "streaming"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"transactions\": [\n    {\n      \"accountType\": \"checking\",\n      \"amountnum\": 19.99,\n      \"date\": \"2024-05-01\",\n      \"original_description\": \"Cottonwood Supermarket & Deli\",\n      \"transactionid\": \"178b1f61-dafe-4d47-837b-54ce34dc82b2\",\n      \"settlement\": \"debit\",\n      \"uid\": \"user123\",\n      \"identifiers\": {\n        \"sfmc_contact_id\": \"sfmc-1234\",\n        \"banno_end_user_id\": \"banno-1234\"\n      },\n      \"accountid\": \"account456\"\n    },\n    {\n      \"accountType\": \"checking\",\n      \"amountnum\": 19.99,\n      \"date\": \"2024-05-01\",\n      \"original_description\": \"Cottonwood Supermarket & Deli\",\n      \"transactionid\": \"178b1f61-dafe-4d47-837b-54ce34dc82b2\",\n      \"settlement\": \"debit\",\n      \"uid\": \"user123\",\n      \"identifiers\": {\n        \"sfmc_contact_id\": \"sfmc-1234\",\n        \"banno_end_user_id\": \"banno-1234\"\n      },\n      \"accountid\": \"account456\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"transactions_received\": false,\n  \"transactions_validated\": true,\n  \"processing\": true,\n  \"num_transactions_processing\": 3798,\n  \"batch_request_id\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "35f62de8-0d89-4dfe-b528-7336a64115f7",
+              "name": "Bad request. An array of errors in the data will be returned. Fields not allowed or incorrectly formatted will be noted.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "cleanup",
+                    "streaming"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"transactions\": [\n    {\n      \"accountType\": \"checking\",\n      \"amountnum\": 19.99,\n      \"date\": \"2024-05-01\",\n      \"original_description\": \"Cottonwood Supermarket & Deli\",\n      \"transactionid\": \"178b1f61-dafe-4d47-837b-54ce34dc82b2\",\n      \"settlement\": \"debit\",\n      \"uid\": \"user123\",\n      \"identifiers\": {\n        \"sfmc_contact_id\": \"sfmc-1234\",\n        \"banno_end_user_id\": \"banno-1234\"\n      },\n      \"accountid\": \"account456\"\n    },\n    {\n      \"accountType\": \"checking\",\n      \"amountnum\": 19.99,\n      \"date\": \"2024-05-01\",\n      \"original_description\": \"Cottonwood Supermarket & Deli\",\n      \"transactionid\": \"178b1f61-dafe-4d47-837b-54ce34dc82b2\",\n      \"settlement\": \"debit\",\n      \"uid\": \"user123\",\n      \"identifiers\": {\n        \"sfmc_contact_id\": \"sfmc-1234\",\n        \"banno_end_user_id\": \"banno-1234\"\n      },\n      \"accountid\": \"account456\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "9c0bff36-f673-4a84-8011-b94696d0bb20",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "cleanup",
+                    "streaming"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"transactions\": [\n    {\n      \"accountType\": \"checking\",\n      \"amountnum\": 19.99,\n      \"date\": \"2024-05-01\",\n      \"original_description\": \"Cottonwood Supermarket & Deli\",\n      \"transactionid\": \"178b1f61-dafe-4d47-837b-54ce34dc82b2\",\n      \"settlement\": \"debit\",\n      \"uid\": \"user123\",\n      \"identifiers\": {\n        \"sfmc_contact_id\": \"sfmc-1234\",\n        \"banno_end_user_id\": \"banno-1234\"\n      },\n      \"accountid\": \"account456\"\n    },\n    {\n      \"accountType\": \"checking\",\n      \"amountnum\": 19.99,\n      \"date\": \"2024-05-01\",\n      \"original_description\": \"Cottonwood Supermarket & Deli\",\n      \"transactionid\": \"178b1f61-dafe-4d47-837b-54ce34dc82b2\",\n      \"settlement\": \"debit\",\n      \"uid\": \"user123\",\n      \"identifiers\": {\n        \"sfmc_contact_id\": \"sfmc-1234\",\n        \"banno_end_user_id\": \"banno-1234\"\n      },\n      \"accountid\": \"account456\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "6bade4de-2b4d-4017-9408-abae96ee7c44",
+          "name": "Base Transaction Enrichment",
+          "request": {
+            "name": "Base Transaction Enrichment",
+            "description": {
+              "content": "FinGoal's base transaction enrichment endpoint is a new and improved model for enriching daily user, historical, or one off user transactions. It accepts additional `accountTypes` that previous enrichment endpoints did not, including `businessChecking`, `businessSavings`, `businessCreditCard`, `businessLoan`, `loan`, `investments`.\n\nRequests that include many users (by uid) will not deteriorate the endpoint's performance and it has much higher throughput than previous enrichment endpoints. \n\nThis endpoint is asynchronous. A webhook will be sent to the provided URL when a batch of transactions has been enriched.\n\nTo maximize throughput for this endpoint, follow these guidelines: \n  - Limit each request to a total of approximately 1,000 transactions. \n  - Transactions can be distributed among any number of users as long as the total number of transactions does not exceed 1,000.\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "cleanup",
+                "base"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "scope",
+                  "value": "enrichment"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "https://findmoney.fingoal.com/v3/authentication"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "client_credentials"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"transactions\": [\n    {\n      \"accountType\": \"<string>\",\n      \"amountnum\": \"<number>\",\n      \"date\": \"<date>\",\n      \"original_description\": \"<string>\",\n      \"transactionid\": \"<string>\",\n      \"settlement\": \"<string>\",\n      \"uid\": \"<string>\",\n      \"identifiers\": {\n        \"sfmc_contact_id\": \"<string>\",\n        \"banno_end_user_id\": \"<string>\"\n      }\n    },\n    {\n      \"accountType\": \"<string>\",\n      \"amountnum\": \"<number>\",\n      \"date\": \"<date>\",\n      \"original_description\": \"<string>\",\n      \"transactionid\": \"<string>\",\n      \"settlement\": \"<string>\",\n      \"uid\": \"<string>\",\n      \"identifiers\": {\n        \"sfmc_contact_id\": \"<string>\",\n        \"banno_end_user_id\": \"<string>\"\n      }\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "55b451ed-b001-4f36-a1f2-7d888c754a79",
+              "name": "Success",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "cleanup",
+                    "base"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"transactions\": [\n    {\n      \"accountType\": \"checking\",\n      \"amountnum\": 19.99,\n      \"date\": \"2024-05-01\",\n      \"original_description\": \"Cottonwood Supermarket & Deli\",\n      \"transactionid\": \"178b1f61-dafe-4d47-837b-54ce34dc82b2\",\n      \"settlement\": \"debit\",\n      \"uid\": \"user123\",\n      \"identifiers\": {\n        \"sfmc_contact_id\": \"sfmc-1234\",\n        \"banno_end_user_id\": \"banno-1234\"\n      }\n    },\n    {\n      \"accountType\": \"checking\",\n      \"amountnum\": 19.99,\n      \"date\": \"2024-05-01\",\n      \"original_description\": \"Cottonwood Supermarket & Deli\",\n      \"transactionid\": \"178b1f61-dafe-4d47-837b-54ce34dc82b2\",\n      \"settlement\": \"debit\",\n      \"uid\": \"user123\",\n      \"identifiers\": {\n        \"sfmc_contact_id\": \"sfmc-1234\",\n        \"banno_end_user_id\": \"banno-1234\"\n      }\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"transactions_received\": false,\n  \"transactions_validated\": true,\n  \"processing\": true,\n  \"num_transactions_processing\": 3798,\n  \"batch_request_id\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "5f68d659-9029-4748-bcc7-b956af4d6d50",
+              "name": "Bad request. An array of errors in the data will be returned. Fields not allowed or incorrectly formatted will be noted.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "cleanup",
+                    "base"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"transactions\": [\n    {\n      \"accountType\": \"checking\",\n      \"amountnum\": 19.99,\n      \"date\": \"2024-05-01\",\n      \"original_description\": \"Cottonwood Supermarket & Deli\",\n      \"transactionid\": \"178b1f61-dafe-4d47-837b-54ce34dc82b2\",\n      \"settlement\": \"debit\",\n      \"uid\": \"user123\",\n      \"identifiers\": {\n        \"sfmc_contact_id\": \"sfmc-1234\",\n        \"banno_end_user_id\": \"banno-1234\"\n      }\n    },\n    {\n      \"accountType\": \"checking\",\n      \"amountnum\": 19.99,\n      \"date\": \"2024-05-01\",\n      \"original_description\": \"Cottonwood Supermarket & Deli\",\n      \"transactionid\": \"178b1f61-dafe-4d47-837b-54ce34dc82b2\",\n      \"settlement\": \"debit\",\n      \"uid\": \"user123\",\n      \"identifiers\": {\n        \"sfmc_contact_id\": \"sfmc-1234\",\n        \"banno_end_user_id\": \"banno-1234\"\n      }\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "b55c7b7e-282c-4549-9d8a-260306f3eebe",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "cleanup",
+                    "base"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"transactions\": [\n    {\n      \"accountType\": \"checking\",\n      \"amountnum\": 19.99,\n      \"date\": \"2024-05-01\",\n      \"original_description\": \"Cottonwood Supermarket & Deli\",\n      \"transactionid\": \"178b1f61-dafe-4d47-837b-54ce34dc82b2\",\n      \"settlement\": \"debit\",\n      \"uid\": \"user123\",\n      \"identifiers\": {\n        \"sfmc_contact_id\": \"sfmc-1234\",\n        \"banno_end_user_id\": \"banno-1234\"\n      }\n    },\n    {\n      \"accountType\": \"checking\",\n      \"amountnum\": 19.99,\n      \"date\": \"2024-05-01\",\n      \"original_description\": \"Cottonwood Supermarket & Deli\",\n      \"transactionid\": \"178b1f61-dafe-4d47-837b-54ce34dc82b2\",\n      \"settlement\": \"debit\",\n      \"uid\": \"user123\",\n      \"identifiers\": {\n        \"sfmc_contact_id\": \"sfmc-1234\",\n        \"banno_end_user_id\": \"banno-1234\"\n      }\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "0d1404d1-dc12-4687-9adb-8fd765eaa821",
+          "name": "Retrieve Enrichment by Batch Request ID",
+          "request": {
+            "name": "Retrieve Enrichment by Batch Request ID",
+            "description": {
+              "content": "Developers may use this endpoint in conjunction with the [asynchronous cleanup endpoints](#operation/asyncCleanupTransactions) to retrieve the results of a transaction cleanup operation by its batch operation ID.\nThe operation ID can be extracted from the webhook that the async cleanup endpoint sends when enrichment is complete.  \n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "cleanup",
+                ":batch_request_id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "batch_request_id",
+                  "description": "(Required) The Batch Request ID of the enrichment request."
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "scope",
+                  "value": "enrichment"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "https://findmoney.fingoal.com/v3/authentication"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "client_credentials"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "e57460af-3dca-46ec-9335-74b91692787e",
+              "name": "Success",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "cleanup",
+                    ":batch_request_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "batch_request_id",
+                      "description": "(Required) The Batch Request ID of the enrichment request."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"enrichedTransactions\": [\n    {\n      \"accountid\": \"string\",\n      \"accountType\": \"string\",\n      \"amountnum\": 3948.7677083487015,\n      \"category\": \"string\",\n      \"categoryId\": 129.81860634870168,\n      \"categoryLabel\": [\n        \"string\",\n        \"string\"\n      ],\n      \"address\": \"123 Main St\",\n      \"city\": \"Urbana\",\n      \"client_id\": \"string\",\n      \"container\": \"Transaction\",\n      \"date\": \"2002-04-13T10:16:29.947Z\",\n      \"detailCategoryId\": 6300.959965623863,\n      \"guid\": \"string\",\n      \"highLevelCategoryId\": 3551.433853130199,\n      \"isPhysical\": true,\n      \"isRecurring\": false,\n      \"merchantAddress1\": \"123 Main St\",\n      \"merchantCity\": \"Urbana\",\n      \"merchantCountry\": \"US\",\n      \"merchantLatitude\": \"38.9517\",\n      \"merchantLogoURL\": \"string\",\n      \"merchantLongitude\": \"-92.3341\",\n      \"merchantName\": \"Dollar General\",\n      \"merchantPhoneNumber\": \"555-555-5555\",\n      \"merchantState\": \"MO\",\n      \"merchantType\": \"retail\",\n      \"merchantZip\": \"65401\",\n      \"original_description\": \"string\",\n      \"receiptDate\": \"2024-05-01T12:00:00Z\",\n      \"requestId\": \"04f00a35-a8fa-40fd-a2ee-4af7be22ed0a\",\n      \"simple_description\": \"string\",\n      \"simpleDescription\": \"string\",\n      \"settlement\": \"debit\",\n      \"sourceId\": \"1234\",\n      \"state\": \"MO\",\n      \"subtype\": \"purchase\",\n      \"subType\": \"purchase\",\n      \"tenant_id\": \"TNT-4b7d4b7d-4b7d-4b7d-4b7d-4b7d4b7d4b7d\",\n      \"transactionid\": \"string\",\n      \"transactionTags\": [\n        \"string\",\n        \"string\"\n      ],\n      \"transactionTagsId\": [\n        6435,\n        8979\n      ],\n      \"type\": \"string\",\n      \"uid\": \"string\",\n      \"website\": \"https://links.fingoal.com/dollar-general\",\n      \"zip_code\": \"65401\"\n    },\n    {\n      \"accountid\": \"string\",\n      \"accountType\": \"string\",\n      \"amountnum\": 7912.698200451337,\n      \"category\": \"string\",\n      \"categoryId\": 9567.612965532959,\n      \"categoryLabel\": [\n        \"string\",\n        \"string\"\n      ],\n      \"address\": \"123 Main St\",\n      \"city\": \"Urbana\",\n      \"client_id\": \"string\",\n      \"container\": \"Transaction\",\n      \"date\": \"1979-02-27T00:16:06.404Z\",\n      \"detailCategoryId\": 3683.170631090753,\n      \"guid\": \"string\",\n      \"highLevelCategoryId\": 1823.8174655849336,\n      \"isPhysical\": true,\n      \"isRecurring\": false,\n      \"merchantAddress1\": \"123 Main St\",\n      \"merchantCity\": \"Urbana\",\n      \"merchantCountry\": \"US\",\n      \"merchantLatitude\": \"38.9517\",\n      \"merchantLogoURL\": \"string\",\n      \"merchantLongitude\": \"-92.3341\",\n      \"merchantName\": \"Dollar General\",\n      \"merchantPhoneNumber\": \"555-555-5555\",\n      \"merchantState\": \"MO\",\n      \"merchantType\": \"retail\",\n      \"merchantZip\": \"65401\",\n      \"original_description\": \"string\",\n      \"receiptDate\": \"2024-05-01T12:00:00Z\",\n      \"requestId\": \"04f00a35-a8fa-40fd-a2ee-4af7be22ed0a\",\n      \"simple_description\": \"string\",\n      \"simpleDescription\": \"string\",\n      \"settlement\": \"debit\",\n      \"sourceId\": \"1234\",\n      \"state\": \"MO\",\n      \"subtype\": \"purchase\",\n      \"subType\": \"purchase\",\n      \"tenant_id\": \"TNT-4b7d4b7d-4b7d-4b7d-4b7d-4b7d4b7d4b7d\",\n      \"transactionid\": \"string\",\n      \"transactionTags\": [\n        \"string\",\n        \"string\"\n      ],\n      \"transactionTagsId\": [\n        1098,\n        6629\n      ],\n      \"type\": \"string\",\n      \"uid\": \"string\",\n      \"website\": \"https://links.fingoal.com/dollar-general\",\n      \"zip_code\": \"65401\"\n    }\n  ],\n  \"failedTransactions\": [\n    {\n      \"transactionid\": \"string\",\n      \"amountnum\": 1687.0643868129043,\n      \"original_description\": \"string\",\n      \"uid\": \"string\",\n      \"date\": \"1954-01-30T11:59:26.083Z\",\n      \"settlement\": \"string\",\n      \"accountType\": \"string\"\n    },\n    {\n      \"transactionid\": \"string\",\n      \"amountnum\": 2830.010343613344,\n      \"original_description\": \"string\",\n      \"uid\": \"string\",\n      \"date\": \"1950-02-23T20:38:51.509Z\",\n      \"settlement\": \"string\",\n      \"accountType\": \"string\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "4efd33fd-7ad8-4dfe-8ebc-790d67ecd165",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "cleanup",
+                    ":batch_request_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "batch_request_id",
+                      "description": "(Required) The Batch Request ID of the enrichment request."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "01ee2ed7-8abc-484a-9933-f2c16eea23f8",
+              "name": "No transactions found for the given request id.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "cleanup",
+                    ":batch_request_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "batch_request_id",
+                      "description": "(Required) The Batch Request ID of the enrichment request."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://findmoney-dev.fingoal.com/v3",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "oauth2",
+    "oauth2": [
+      {
+        "key": "scope",
+        "value": "enrichment"
+      },
+      {
+        "key": "accessTokenUrl",
+        "value": "https://findmoney.fingoal.com/v3/authentication"
+      },
+      {
+        "key": "grant_type",
+        "value": "client_credentials"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "6b123780-ebbe-40f1-9d1f-7541f29a9d9a",
+    "name": "Insights Enrichment API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "# Overview\n[Download our postman collection here.](https://fingoal.dev/FinGoal%20Enrichment.postman_collection.json)\n\nThe Insights API provides developers with tools to enhance their transaction, account, and user data with deep enrichment. Although the information returned by the Insights API can be utilized in various ways and implementations may differ, the initial steps for using the API are consistent: \n1. Request a FinGoal developer account.\n2. Obtain API access credentials.\n3. Generate an Insights API authentication token. \n4. Submit transactions to the Insights API. \n5. Register for Webhooks.\n6. Request Enrichment.\n\n## Important Resources\n- [Complete Insights API Tag Registry](https://fingoal.com/tags-list)\n- [Complete Insights API Categorization Spreadsheet](https://docs.google.com/spreadsheets/d/1jnmw1LriclC3bO-oC7f7EkhmfCL7gw2LQLX8zay1vXw/edit?gid=0#gid=0)\n\n## Request a FinGoal Developer Account\nTo use the Insights API, you need authentication credentials. These credentials can be obtained by <a href=\"https://fingoal.com/request-developer-account\" target=\"_blank\"> requesting a FinGoal developer account</a>. FinGoal developer support will send you development environment credentials within 24 hours. These credentials are required for the quickstart. \n# Quickstart\n## Generate a JWT Authentication Token\nAll Insights API endpoints require an `Authorization` header with a `Bearer` token. This token is a JSON Web Token (JWT) generated by the Insights API authentication endpoint. To generate this token, you will need the `client_id` and `client_secret` provided when you requested a FinGoal developer account. \n\n### 1. Prepare the Request Body\nThe request body is a JSON object with the following structure:\n```json\n{\n\t\"client_id\": \"{YOUR_CLIENT_ID}\",\n\t\"client_secret\": \"{YOUR_CLIENT_SECRET}\"\n} \n```\n### 2. Make a POST Request\nMake a POST request to the Insights API authentication endpoint using the prepared JSON object.\n```js\nconst body = {\n  \"client_id\": \"{YOUR_CLIENT_ID}\",\n  \"client_secret\": \"{YOUR_CLIENT_SECRET}\"\n}\n\nconst requestOptions = {\n  method: 'POST',\n  body: body,\n};\n\ntry {\n\tconst response = await fetch(\"https://findmoney-dev.fingoal.com/v3/authentication\", requestOptions);\n  const data = response.json();\n\tconst { access_token } = data;\n\tconsole.log({ access_token });\n} catch(error) {\n\tconsole.log('AUTHENTICATION_ERROR:', error);\n}\n```\nThe JavaScript code above uses the `fetch` API to request an access token. If the request succeeds, it extracts the access_token from the response body. If an error occurs, it logs the error. \n\n### Successful Response\nIf the request is successful, the response body will contain a JSON object with the following structure:\n- `access_token`: The JWT token used to authenticate requests to the Insights API.\n- `scope`: The permissions that the token has.\n- `expires_in`: The number of seconds until the token expires (always 86400 seconds, or 24 hours). \n- `token_type`: The type of token. This value is always `Bearer`.\n```json\n{\n    \"access_token\": \"eyJh...\",\n    \"scope\": \"read:transactions write:transactions ...\",\n    \"expires_in\": 86400,\n    \"token_type\": \"Bearer\"\n}\n```\n### Best Practices \n- Store the `access_token` securely. Do not expose it in client-side code.\n- Use the `expires_in` value to determine when to refresh the token.\n- Regenerate a new token only after the current token has expired.\n\n## Include the JWT Token in Requests\nTo authenticate your requests to the Insights API, you must include the JWT token in the `Authorization` header. The header should have the following structure:\n```json\n{\n  \"Authorization\": \"Bearer {YOUR_ACCESS_TOKEN}\"\n}\n```\nThis header will successfully authenticate any request to the Insights API. You can now proceed to the enrichment, tagging, or savings recommendations quickstarts to integrate the Insights API into your application.\n\n## Tenancy \nInsights API supports the concept of tenancy. A `tenant` refers to a grouping of customer data (users, transactions, tags, accounts, etc.) that may be accessible to multiple clients. By default, a new client’s connection to the InsightsAPI does not use tenancy; however, they may enable tenancy at any time.\n\nCurrently, Insights API does not allow you to create custom tenants. The FinGoal customer support team needs to coordinate with both the client & tenant parties to set up a new connection. If a client’s request for access to a tenant is approved, FinGoal will send the client an identifier for the tenant, and authorize them to access that tenant’s resources. \n\nTo interact with the Insights API on behalf of a tenant, include a tenant_id in your Insights API token request: \n\n```js\nconst response = await fetch(\"{INSIGHTS_API_BASE_URL}/v3/authentication\", {\n\t\tmethod: \"POST\",\n\t\tdata: {\n\t\t\t\tclient_id: \"{MY_CLIENT_ID}\",\n\t\t\t\tclient_secret: \"{MY_CLIENT_SECRET}\",\n\t\t\t\ttenant_id: \"{TENANT_ID_FROM_FINGOAL}\"\n\t\t}\n});\n```\n\nBy including the `tenant_id` in your token scopes, the generated token allows you to: \n\n- Write data to the tenant’s environment.\n- Read data from the tenant’s environment.\n\n<aside>\nIf you do not include a tenant ID, your token will only allow you to access data you have created without a specific tenant association. \n</aside>\n\nAs soon as you are successfully added to a tenant’s data silo, you will begin receiving webhook updates for all activity in that silo. Note that this may include new enrichment data that is added to the environment by clients other than yourself. Refer to the webhook documentation for more information on the content of Insights API webhooks.",
+      "type": "text/plain"
+    }
+  }
+}

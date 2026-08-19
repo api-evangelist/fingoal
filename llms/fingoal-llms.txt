@@ -1,26 +1,29 @@
 # FinGoal
 
-> FinGoal provides financial data insights for banks, credit unions, and fintechs. The Insights API enriches raw transaction data with clean merchant names, categorization, and FinGoal Persona Tags, and pushes updated user tags and enrichment results via webhooks. Authentication is a JWT minted from client_id/client_secret; developer credentials are issued on request.
+> FinGoal provides financial data insights for banks, credit unions, and fintechs. The Insights API enriches raw transaction data with clean merchant names, categorization, and FinGoal Persona Tags, and pushes updated user tags and enrichment results via webhooks. Link Money is a separate authentication portal in front of a shared Yodlee aggregation instance, used to link and verify accounts across 17,000+ financial institutions. Both APIs authenticate with a JWT minted from client credentials; there is no self-serve signup - developer credentials are issued on reviewed request.
 
 ## APIs
 
 - [Insights API docs](https://docs.fingoal.dev/): Transaction enrichment, user tags, and webhook configuration. Base URLs: https://findmoney-dev.fingoal.com/v3 (dev), https://findmoney.fingoal.com/v3 (prod).
-- [Link Money docs](https://link-money-docs.fingoal.dev/): Account aggregation and verification across 17,000+ financial institutions.
+- [Link Money docs](https://link-money-docs.fingoal.dev/): Account aggregation and verification. Base URL: https://link-money-dev.fingoal.dev/api (only host published). Proxies the Yodlee Core API.
 
 ## Specs
 
-- [Insights OpenAPI 3.1 (swagger.json)](https://docs.fingoal.dev/swagger.json): 12 operations across enrichment, users/tags, and webhook-configurations.
+- [Insights OpenAPI 3.1 (swagger.json)](https://docs.fingoal.dev/swagger.json): version 3.1.3, 12 operations across enrichment, users/tags, and webhook-configurations.
+- [Link Money OpenAPI 3.1 (swagger.json)](https://link-money-docs.fingoal.dev/swagger.json): version 1.0.0, 9 operations across client management, webhooks, and FastLink.
 - [Postman collection](https://fingoal.dev/FinGoal%20Enrichment.postman_collection.json): FinGoal Enrichment collection.
 
 ## Docs
 
 - [Developer documentation](https://fingoal.com/developer-documentation)
+- [Developer FAQs](https://fingoal.com/developer-faqs)
 - [Request a developer account](https://fingoal.com/request-developer-account)
 - [Insights API Tag Registry](https://fingoal.com/tags-list)
 - [Privacy & Security (SOC 2 Type II, GDPR)](https://fingoal.com/fingoal-privacy-security)
 - [Blog](https://fingoal.com/blog)
+- [Contact / support](https://fingoal.com/contact)
 
-## Operations
+## Insights API operations
 
 - syncCleanupTransactions - POST /cleanup/sync - Test (synchronous) transaction enrichment
 - asyncCleanupTransactions - POST /cleanup - Historical (async) transaction enrichment
@@ -35,7 +38,33 @@
 - deleteWebhookConfiguration - DELETE /webhook-configurations
 - testWebhook - POST /webhook-configurations/test
 
+## Link Money API operations
+
+- oauthToken - POST /oauth/token - Obtain a tenant-scoped access token
+- getClient - GET /client - View your client configuration
+- getWebhooks - GET /client/webhooks - List configured webhooks
+- createWebhook - POST /client/webhooks - Enable a new webhook
+- getWebhook - GET /client/webhooks/{webhookId} - Retrieve a webhook
+- updateWebhook - PATCH /client/webhooks/{webhookId} - Update a webhook
+- deleteWebhook - DELETE /client/webhooks/{webhookId} - Delete a webhook
+- fireTestWebhook - POST /client/webhooks/{webhookId}/fire_test_webhook - Trigger a test webhook
+- getFastlinkFourDetails - POST /yodlee/fastlink/get - Retrieve Yodlee FastLink 4 session details
+
 ## Authentication
 
-- POST https://findmoney.fingoal.com/v3/authentication with {"client_id","client_secret"} returns a JWT access_token.
-- Send Authorization: Bearer <access_token> on all requests. OAuth2 scopes: enrichment, read, calls_to_action.
+- Insights API: POST https://findmoney.fingoal.com/v3/authentication with {"client_id","client_secret"} returns a JWT access_token valid 86400s. OAuth2 scopes: enrichment, read, calls_to_action.
+- Link Money: POST https://link-money-dev.fingoal.dev/api/oauth/token with {"clientId","clientSecret","tenantId"} returns {"token"}, valid 1 hour and scoped to a single tenant.
+- Both: send Authorization: Bearer <token>.
+
+## Events
+
+- Insights webhooks: ENRICHMENT_DATA, ENRICHMENT_NOTIFICATION, USER_TAGS_DATA, USER_TAGS_NOTIFICATION, INSIGHTS. Each delivery carries an X-Webhook-Verification SHA-256 HMAC header.
+- Link Money webhooks: DATA_UPDATES, REFRESH, AUTO_REFRESH_UPDATES, LATEST_BALANCE_UPDATES, CDV_STATUS_UPDATES, OB_CONSENT, OB_ACTIVE_CONSENT_REMINDER.
+
+## Known gaps
+
+- No pricing page (https://fingoal.com/pricing returns 404); commercial terms are sales-negotiated.
+- No status page (status.fingoal.com does not resolve), no SLA, and no dated changelog.
+- No first-party SDKs on npm, PyPI, RubyGems or crates.io.
+- No published rate limits or rate-limit response headers; only per-request payload sizing guidance.
+- No MCP server and no A2A agent card.

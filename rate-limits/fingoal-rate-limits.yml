@@ -1,0 +1,81 @@
+generated: '2026-08-14'
+method: searched
+source: https://docs.fingoal.dev/swagger.json
+docs: https://docs.fingoal.dev/
+limit_count: 4
+response_headers: []
+exhaustion_status: null
+note: >-
+  FinGoal publishes no request-rate limit and no rate-limit response headers. The
+  Insights API returns no X-RateLimit-*, RateLimit-* or Retry-After header in its
+  documented responses, and neither the OpenAPI nor the developer FAQ
+  (https://fingoal.com/developer-faqs) names a per-key or per-account request
+  ceiling or a 429 status. What FinGoal does publish is per-request PAYLOAD and
+  throughput guidance, stated in the operation descriptions of the Insights
+  OpenAPI - these are batch-shaping rules, not a rate limiter, and are recorded
+  below as the only published limits. An agent integrating FinGoal has no runtime
+  signal to back off on; it must size batches to these documented ceilings.
+limits:
+- scope: per-request
+  operation: syncCleanupTransactions
+  endpoint: POST /cleanup/sync
+  limit: 4 unique users per request
+  detail: >-
+    "Submit no more than 4 unique users per request. Users are distinguished by
+    the `uid` field in each transaction."
+  window: per-request
+  enforcement: documented-guidance
+- scope: per-request
+  operation: syncCleanupTransactions
+  endpoint: POST /cleanup/sync
+  limit: 16 transactions per user (multi-user) / 128 transactions (single user)
+  detail: >-
+    "Submit no more than 16 transactions per user per request if sending multiple
+    users. Send no more than 128 if sending a single user."
+  window: per-request
+  enforcement: documented-guidance
+- scope: per-request
+  operation: asyncCleanupTransactions
+  endpoint: POST /cleanup
+  limit: ~1000 transactions per request
+  detail: >-
+    "Limit each request to approximately 1,000 transactions. The payload can
+    include multiple uids." Group transactions by `uid` and include all
+    transactions for a single `uid` in the same payload.
+  window: per-request
+  enforcement: documented-guidance
+- scope: per-request
+  operation: streamingCleanupTransactions, baseCleanupTransactions
+  endpoint: POST /cleanup/streaming, POST /cleanup/base
+  limit: ~1000 transactions per request
+  detail: >-
+    "Limit each request to a total of approximately 1,000 transactions.
+    Transactions can be distributed among any number of users as long as the
+    total number of transactions does not exceed 1,000."
+  window: per-request
+  enforcement: documented-guidance
+field_limits:
+- field: amountnum
+  constraint: string representation must be fewer than 11 characters
+- field: original_description
+  constraint: 1-198 characters; longer values are automatically truncated
+- field: transactionid
+  constraint: max 100 characters
+- field: uid
+  constraint: max 50 characters
+- field: accountid
+  constraint: max 50 characters
+token_limits:
+- surface: Insights API
+  detail: JWT access_token expires_in is always 86400 seconds (24 hours).
+- surface: Link Money API
+  detail: >-
+    "The Link Money JWT is valid for 1 hour and grants access to a single tenant
+    in the Link Money API."
+  source: https://link-money-docs.fingoal.dev/swagger.json
+evidence:
+- url: https://docs.fingoal.dev/swagger.json
+  status: 200
+- url: https://fingoal.com/developer-faqs
+  status: 200
+  finding: no rate limit, throughput limit, or SLA stated

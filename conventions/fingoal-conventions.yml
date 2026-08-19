@@ -1,7 +1,14 @@
-generated: '2026-07-19'
+generated: '2026-08-14'
 method: searched
-source: openapi/fingoal-insights-openapi-original.json
+source: >-
+  openapi/_original/fingoal-insights-openapi-original.json,
+  openapi/_original/fingoal-link-money-openapi-original.json,
+  https://fingoal.com/developer-faqs
 docs: https://docs.fingoal.dev/
+scope: >-
+  Unless a field says otherwise, everything below describes the Insights API.
+  Link Money is a separate product with its own conventions; where they differ,
+  the difference is called out under link_money.
 authentication:
   style: bearer-jwt
   detail: >-
@@ -49,7 +56,55 @@ webhooks:
   see: asyncapi/fingoal-webhooks.yml
 rate_limit_signaling:
   documented: false
+  note: >-
+    No X-RateLimit-*, RateLimit-* or Retry-After header appears in any documented
+    response, and no 429 is described. What FinGoal publishes instead is
+    per-request payload sizing guidance (4 users / 16 transactions per user on
+    the sync endpoint, ~1,000 transactions on the async endpoints).
+  see: rate-limits/fingoal-rate-limits.yml
 versioning:
   scheme: uri-path
   current: v3
   see: lifecycle/fingoal-lifecycle.yml
+link_money:
+  authentication:
+    style: bearer-jwt
+    token_endpoint: POST /api/oauth/token
+    request_fields:
+    - clientId
+    - clientSecret
+    - tenantId
+    response_field: token
+    ttl: 1 hour
+    note: >-
+      Camel-cased credential fields, unlike the Insights API's snake_cased
+      {client_id, client_secret}. The token is scoped to a SINGLE tenant - mint a
+      separate token per tenant.
+  tenancy:
+    required: true
+    note: >-
+      tenantId is part of the token request itself rather than a header, so
+      tenancy is bound to the credential, not the call.
+  path_prefix:
+    note: >-
+      servers[] publishes https://link-money-dev.fingoal.dev, but every request
+      example in the same document calls
+      https://link-money-dev.fingoal.dev/api/... - operations are served under an
+      /api prefix that servers[] omits.
+  proxy_model:
+    note: >-
+      Beyond the nine operations described in the Link Money OpenAPI, the API is
+      a direct proxy to the Yodlee Core API and surfaces those endpoints
+      "unaltered". The one deviation FinGoal documents: the user's `loginName`
+      moves into a request HEADER instead of the payload. Those proxied
+      operations have no machine-readable description on FinGoal's side.
+  webhooks:
+    self_service: true
+    note: >-
+      Unlike the Insights API (where webhook registration for the legacy flow
+      goes through support@fingoal.com), Link Money webhooks are registered via
+      POST /client/webhooks and expose delivery health (status, lastAttempt,
+      lastAttemptStatus, lastSuccess) on the registration record.
+    see: asyncapi/fingoal-link-money-webhooks.yml
+  components:
+    see: components/fingoal-components.yml

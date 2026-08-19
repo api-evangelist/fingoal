@@ -1,0 +1,29 @@
+generated: '2026-08-14'
+method: searched
+source: https://fingoal.com/developer-documentation
+plan_count: 0
+plans: []
+model: contact-sales
+note: >-
+  FinGoal publishes no pricing. https://fingoal.com/pricing returns HTTP 404, and
+  the site navigation on https://fingoal.com/ carries no pricing entry at all
+  (About, What We Do, Resources, Developers, Instant Demo, Contact). The
+  developer landing page at https://fingoal.com/developer-documentation offers
+  only two account-request forms - one for the Insights API and one for Link
+  Money - and the developer FAQ at https://fingoal.com/developer-faqs states no
+  price, quota, overage or SLA. Access is gated behind a reviewed developer
+  account request (https://fingoal.com/request-developer-account, ~24h turnaround
+  for development credentials); commercial terms are negotiated with sales. This
+  is a real zero, not an unchecked field.
+evidence:
+- url: https://fingoal.com/pricing
+  status: 404
+- url: https://fingoal.com/
+  status: 200
+  finding: no pricing link in navigation or footer
+- url: https://fingoal.com/developer-documentation
+  status: 200
+  finding: account-request forms only, no pricing
+- url: https://fingoal.com/developer-faqs
+  status: 200
+  finding: no pricing, quota, or SLA statement

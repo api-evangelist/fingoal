@@ -1,11 +1,16 @@
-generated: '2026-07-19'
+generated: '2026-08-14'
 method: derived
 status: candidate
-source: openapi/fingoal-insights-openapi-original.json
+source: >-
+  openapi/_original/fingoal-insights-openapi-original.json,
+  openapi/_original/fingoal-link-money-openapi-original.json
 note: >-
-  No official hosted/remote FinGoal MCP server was found (docs, npm
-  @modelcontextprotocol, MCP registries). Tools below are candidate mappings,
-  one per Insights API operation, to seed a future MCP server.
+  No official hosted or local FinGoal MCP server exists. Re-checked 2026-08-14:
+  npm search for "fingoal" returns 0 packages, the github.com/fingoal
+  organisation ships no server, and neither docs host nor the MCP registries
+  reference one. The tools below are CANDIDATE mappings derived one-per-operation
+  from FinGoal's own published OpenAPIs, to seed a future server. Nothing here is
+  callable today - no endpoint is asserted.
 server:
   name: fingoal-insights
   transport: http
@@ -46,3 +51,42 @@ tools:
 - name: test_webhook
   description: Send a sample webhook payload to a callback URL.
   source_operation: openapi/fingoal-insights-openapi-original.json#testWebhook
+- name: link_money_get_token
+  description: Mint a tenant-scoped Link Money JWT from clientId/clientSecret/tenantId.
+  source_operation: openapi/_original/fingoal-link-money-openapi-original.json#oauthToken
+- name: link_money_get_client
+  description: View the Link Money client configuration and authorized tenants.
+  source_operation: openapi/_original/fingoal-link-money-openapi-original.json#getClient
+- name: link_money_list_webhooks
+  description: List configured Link Money webhooks.
+  source_operation: openapi/_original/fingoal-link-money-openapi-original.json#getWebhooks
+- name: link_money_create_webhook
+  description: Register a Link Money webhook URI for one or more event types.
+  source_operation: openapi/_original/fingoal-link-money-openapi-original.json#createWebhook
+- name: link_money_get_webhook
+  description: Retrieve one Link Money webhook, including its delivery-health fields.
+  source_operation: openapi/_original/fingoal-link-money-openapi-original.json#getWebhook
+- name: link_money_update_webhook
+  description: Update a Link Money webhook URI, event types, or disabled flag.
+  source_operation: openapi/_original/fingoal-link-money-openapi-original.json#updateWebhook
+- name: link_money_delete_webhook
+  description: Delete a Link Money webhook configuration.
+  source_operation: openapi/_original/fingoal-link-money-openapi-original.json#deleteWebhook
+- name: link_money_fire_test_webhook
+  description: Trigger a test delivery to a registered Link Money webhook.
+  source_operation: openapi/_original/fingoal-link-money-openapi-original.json#fireTestWebhook
+- name: link_money_get_fastlink_details
+  description: Retrieve Yodlee FastLink 4 accessToken and fastLinkURL for a user.
+  source_operation: openapi/_original/fingoal-link-money-openapi-original.json#getFastlinkFourDetails
+deployment:
+  mode: none
+  endpoint: null
+  install: null
+  package: null
+  auth: unknown
+  verified: searched
+  tools: 21
+  checked: '2026-08-14'
+  source: >-
+    npm registry search (0 results), github.com/fingoal repo list, MCP registry
+    and web search - no hosted endpoint and no stdio package published by FinGoal.

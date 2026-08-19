@@ -1,0 +1,714 @@
+openapi: 3.1.0
+info:
+  title: Link Money API
+  description: "The Link Money API is an authentication portal that allows multiple developers to access the same financial\
+    \ data from an aggregation API.\n\n## How does Link Money work? \nSam is a developer at a fintech startup called TechFinance.\
+    \ TechFinance is building a personal finance app that helps users track their spending and savings. Sam wants to integrate\
+    \ a third-party aggregation API to pull in user financial data. \n\nHowever, TechFinance deploys its technologies to a\
+    \ bank, BankNouveau, that has other fintech partners working on other applications. BankNouveau prefers that they use\
+    \ a single aggregation API to avoid multiple integrations, and to permit all developers, and the bank itself, to have\
+    \ access to any and all aggregated customer financial data. \n\nWith Link Money, BankNouveau can access a siloed instance\
+    \ of the aggregation API. Developers like Sam authenticate with Link Money to prove they are allowed to access the customer\
+    \ data that BankNouveau has aggregated. Once the developer is authenticated, Link Money API surfaces the aggregation API's\
+    \ endpoints unaltered to the developer.\n\n## Why use Link Money? \n- You are an FI looking to buy a single aggregation\
+    \ instance and authenticate third-party trusted developers to access it.\n- You are developer looking to introduce a single\
+    \ aggregation API to a bank or FI that has multiple fintech partners.\n- You are a developer looking to access a single\
+    \ aggregation API that is shared by multiple fintech partners.\n- You are a developer who needs financial aggregated data,\
+    \ but you think you may need to have more granular control over data access in the future.\n\n# Quickstart \nThis quickstart\
+    \ serves as a guide for developers who are new to aggregation in general. In this quickstart, we will: \n1. Apply for\
+    \ credentials to access the Link Money API. \n2. Use the credentials to generate JWTs.\n3. Open the linking widget in\
+    \ our frontend and link test accounts.\n3. Use the credentials to make manual API requests. \n4. Configure and test webhooks.\
+    \ \n\n## 1. Sign up for a Link Money account. \nTo apply for a Link Money account, [submit a request for access.](https://fingoal.com/request-developer-account)\
+    \ Your request will be reviewed by our team, and you will receive an email with a secure link to your client credentials.\
+    \ These credentials will be used to authenticate your requests to the Link Money API.\n\n## 2. Use your Link Money credentials\
+    \ to generate an authentication token. \nTo generate an authentication token, you will need to use your client credentials\
+    \ to generate a JWT. This JWT will be used to authenticate your requests to the Link Money API.\n\nYou will additionally\
+    \ need to provide a tenant ID, which is a unique identifier for the bank or FI that you are working with. All link money\
+    \ developers are given access to a development environment tenant ID. If you are working with a bank or credit union and\
+    \ need access to their tenant environment, please contact support@fingoal.com with your request. \n\nTo get a JWT token\
+    \ from the API, use the oauth endpoint. \n```js\nconst axios = require('axios'); \n\nconst clientId = 'your_client_id';\n\
+    const clientSecret = 'your_client_secret';\nconst tenantId = 'your_tenant_id';\n\nconst url = 'https://link-money-dev.fingoal.dev/api/oauth/token';\n\
+    try {\n  const response = await axios.post(url, {\n    clientId,\n    clientSecret,\n    tenantId,\n  });\n  const token\
+    \ = response.data.token;\n  console.log(token);\n} catch (error) {\n  console.error(error);\n}\n```\n\nThe Link Money\
+    \ JWT is valid for 1 hour and grants access to a single tenant in the Link Money API. If you need to access multiple tenants,\
+    \ you will need to generate a new JWT for each tenant.  \n\n## 3. Get Fastlink 4 Details from the API \nTo generate a\
+    \ Fastlink token, you will need to use your client credentials to generate a JWT. This JWT will be used to authenticate\
+    \ your requests to the Link Money API.\n\nTo get a Fastlink token from the API, use the fastlink endpoint. \n```js\nconst\
+    \ axios = require('axios');\nconst jwt = 'your_jwt_token'; // see step 2 \nconst url = 'https://link-money-dev.fingoal.dev/api/yodlee/fastlink/get';\n\
+    \ntry {\n  const response = await axios.post(url, { loginName: \"test_user_1\" }, \n    { headers: { Authorization: `Bearer\
+    \ ${jwt}` } }\n  );\n  const fastlink_token = response.data.fastlink_token;\n  console.log(fastlink_token);\n} catch (error)\
+    \ {\n  console.error(error);\n}\n```\nThe Fastlink response payload contains two parameters: \n- `accessToken`: A user-specific\
+    \ Yodlee access token that can be used to authenticate the Fastlink 4 session. \n- `fastLinkURL`: A tenant-specific URL\
+    \ that can be used to open the Fastlink 4 widget in an iframe.\n\n## 4. Open the Fastlink 4 Widget In Your Frontend \n\
+    Once you have the Fastlink 4 response from step 3, you can open the Fastlink 4 widget in your frontend. The following\
+    \ code snippet replicates the default Fastlink 4 configuration code from the Yodlee documentation, with an added `fastlinkFourDetails`\
+    \ that includes the data from step 3. \n\n```html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\"\
+    >\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>FL4 Field Test</title>\n</head>\n\
+    <body>\n  <div id=\"container-fastlink\">\n    <div style=\"text-align: center;\">\n     <input type=\"submit\" id=\"\
+    btn-fastlink\" value=\"Link an Account\">\n  </div>\n  </div>\n<script type='text/javascript' src='https://cdn.yodlee.com/fastlink/v4/initialize.js'></script>\n\
+    <script>\n  const fastlinkFourDetails = {\n    \"accessToken\": \"your_user_access_token\",\n    \"fastLinkURL\": \"tenant_fastlink_url\"\
+    \n  };\n\n  (function (window) {\n    //Open FastLink\n    var fastlinkBtn = document.getElementById('btn-fastlink');\n\
+    \    fastlinkBtn.addEventListener(\n      'click', \n      function() {\n          window.fastlink.open({\n          \
+    \  fastLinkURL: fastlinkFourDetails.fastLinkURL,\n            accessToken: 'Bearer ' + fastlinkFourDetails.accessToken,\n\
+    \            params: {\n              configName : 'aggregation'\n            },\n            onSuccess: function (data)\
+    \ {\n              // will be called on success. For list of possible message, refer to onSuccess(data) Method.\n    \
+    \          console.log(data);\n            },\n            onError: function (data) {\n              // will be called\
+    \ on error. For list of possible message, refer to onError(data) Method.\n              console.log(data);\n         \
+    \   },\n            onClose: function (data) {\n              // will be called called to close FastLink. For list of\
+    \ possible message, refer to onClose(data) Method.\n              console.log(data);\n            },\n            onEvent:\
+    \ function (data) {\n              // will be called on intermittent status update.\n              console.log(data);\n\
+    \            }\n          },\n          'container-fastlink');\n        },\n    false);\n  }(window));\n</script>\n</body>\n\
+    </html>\n```\nLink Money supports 4 configNames for each tenant by default: \n- `aggregation`, for mandatory account aggregation.\n\
+    - `verification`, for mandatory account verification.\n- `aggregation_and_verification`, for mandatory account aggregation\
+    \ and optional account verification.\n- `verification_and_aggregation`, for mandatory account verification and optional\
+    \ account aggregation.\n\nFor more information on using the Yodlee Fastlink, see the [Yodlee Fastlink 4 documentation](https://developer.yodlee.com/resources/yodlee/fastlink-4/docs/documentation).\
+    \ Some functionality, like Fastlink Congifuration, may not be available to you through Link Money. Reach out to Link Money\
+    \ support for more information on what is available to you if you need more advanced Fastlink functionality.\n\n### 5.\
+    \ Make Yodlee API Requests\nThe Link Money API uses a direct proxy to request the Yodlee API. For the most part, you can\
+    \ refer to the [Yodlee Core API documentation](https://developer.yodlee.com/products/yodlee/core-apis/docs/api-reference)\
+    \ for the endpoints and payloads you need to use. \n\nThere is one key difference: Link Money's API requires that you\
+    \ include the `loginName` for the user you are trying to request in the headers, rather than the authorization payload.\
+    \ \n\nAn example GET accounts request to Yodlee through Link Money looks like: \n```js\nconst axios = require('axios');\n\
+    const jwt = \"your_jwt_token\"; // see step 2\nconst url = 'https://link-money-dev.fingoal.dev/api/yodlee/accounts';\n\
+    \ntry {\n  const response = await axios.get(url, {\n    headers: {\n      Authorization: `Bearer ${jwt}`,\n      loginName:\
+    \ 'test_user_1'\n    }\n  });\n  console.log(response.data);\n} catch (error) {\n  console.error(error);\n}\n```\n"
+  version: 1.0.0
+servers:
+- url: https://link-money-dev.fingoal.dev
+  description: Development server
+tags:
+- name: Client Management
+  description: "There are three kinds of people who interact with Link Money: \n- **Users** are the people who use the Link\
+    \ Money application. They are the people who log in, view their accounts, and make transactions.\n- **Clients** are the\
+    \ people who use the Link Money API. They are the people who build applications that interact with the Link Money API.\n\
+    - **Tenants** are the organizations that use Link Money. They are the people who manage the users and clients who interact\
+    \ with Link Money. Generally speaking, the `user` is an end user of the `tenant`'s application, and the `client` is a\
+    \ developer who is building the `tenant`'s application. \n\nEvery developer must have a client configuration in order\
+    \ to access Link Money. This includes developers who are operating within a tenant environment that they themselves manage.\
+    \ \n\n## Webhooks \nLink Money supports all available Yodlee webhooks, which are documented in the [Yodlee API documentation](https://developer.envestnet.com/resources/yodlee/webhooks/docs).\
+    \ Developers can subscribe to webhooks by sending requests to the Link Money API webhook management endpoints. \n\nAs\
+    \ each Link Money tenant is a separate environment, each tenant requires its own webhook subscription. Make sure you authenticate\
+    \ with a token that has the proper tenant ID to ensure tha the webhook subscription is created in the correct tenant environment.\n\
+    \nLink Money tenants are shared by multiple clients, so it is possible to receive webhook notifications from customers\
+    \ who are not specifically accessing your application. Make sure that your application logic accounts for events that\
+    \ are related to users who other clients may have registered. "
+- name: Fastlink
+  description: "The Link Money API permits end users to link and get data from their bank accounts. But of course, that requires\
+    \ a front-end interface. That's where the Fastlink comes in.\n\nThe Fastlink is an example of what we call a \"Linking\
+    \ Widget\" - a small application, usually embedded via iframe in another financial application, that allows end users\
+    \ to interact with an aggregation service - in this case, Yodlee's Fastlink. \n\nIn this documentation `Fastlink` refers\
+    \ specifically to `Fastlink 4`, which is the most recent version of Yodlee's Fastlink widget. We do not support older\
+    \ versions of Fastlink, and urge all of our onboarding customers to upgrade to Fastlink 4. \n\nTo open a frontend session\
+    \ with Link Money's Fastlink4, you must: \n- Have a client registered with the Link Money API\n- Have client credentials\
+    \ for the Link Money API \n- Have a single registered user with the Link Money API\n- Have a web application (or test\
+    \ web application) with HTML and JavaScript where the FL4 can be embedded.\n\n### Step 1: Get an authentication token\n\
+    First, get an authentication token for Link Money. \n```js\nconst fetch = require('node-fetch'); // If using Node.js,\
+    \ ensure to install the 'node-fetch' package\n\n// Client credentials and other required information. We recommend storing\
+    \ these in a secure location, such as a password vault.\nconst clientId = 'YOUR_CLIENT_ID';\nconst clientSecret = 'YOUR_CLIENT_SECRET';\n\
+    \n// The URL to your authentication endpoint\nconst tokenUrl = '{LINK_MONEY_BASE_URL}/oauth/token';\n\n// Prepare the\
+    \ request body\nconst requestBody = { clientId, clientSecret };\n\n// Make the HTTP POST request to obtain the JWT\ntry\
+    \ {\n  const rawResponse = await fetch(tokenUrl, {\n    method: 'POST',\n    headers: {\n      'Content-Type': 'application/json'\n\
+    \    },\n    body: requestBody\n  });\n  const data = await response.json();\n  const token = data.accessToken;\n    //\
+    \ Use the access token for subsequent API requests that require authentication\n} catch(error) {\n  console.error('Error\
+    \ fetching the access token:', error);\n}\n```\n### Step 2: Get the Fastlink configuration\nWith the `token` from the\
+    \ request, you can authorize a call to the Fastlink widget endpoint. \n```js \nconst fetch = require('node-fetch'); //\
+    \ If using Node.js, ensure to install the 'node-fetch' package\nconst accessToken = \"{YOUR_ACCESS_TOKEN}\"; // see previous\
+    \ step.\nconst getFastlinkConfigUrl = '{LINK_MONEY_BASE_URL}/yodlee/fastlink';\nconst login_name = `any_string_of_your_choice`;\n\
+    try {\n  const rawResponse = await fetch(getFastlinkConfigUrl, {\n    method: 'POST',\n    headers: {\n      'Content-Type':\
+    \ 'application/json',\n      'Authorization': `Bearer ${accessToken}`\n    },\n\tbody: { login_name }\n  });\n  const\
+    \ data = await response.json();\n  const { fastlinkConfiguration } = data;\n  const { accessToken, fastLinkURL, configName\
+    \ } = fastlinkConfiguration;\n    // Use the accessToken, fastLinkURL, and configName to embed the Fastlink widget in\
+    \ your application\n} catch(error) {\n  console.error('Error fetching the access token:', error);\n}\n```\n### Step 3:\
+    \ Embed the Fastlink widget\nThe fields provided above have supplied you with everything you need to open the Yodlee Fastlink\
+    \ widget in your application. To complete the integration, you will need to use the Yodlee Fastlink SDK along with the\
+    \ configuration provided above.\n```html\n<!-- Mark Up -->\n<div id=\"container-fastlink\">\n\t<div style=\"text-align:\
+    \ center;\">\n   <input type=\"submit\" id=\"btn-fastlink\" value=\"Link an Account\">\n</div>\n</div>\n\n<!-- Yodlee\
+    \ FL4 CDN -->\n<script type='text/javascript' src='https://cdn.yodlee.com/fastlink/v4/initialize.js'></script>\n\n<!--\
+    \ Yodlee FL4 Config -->\n<script> \n// embed the code provided in the previous step here to receive...\nconst { accessToken,\
+    \ fastLinkURL, configName } = fastlinkConfiguration;\n(function (window) {\n  //Open FastLink\n  const fastlinkBtn = document.getElementById('btn-fastlink');\n\
+    \  fastlinkBtn.addEventListener('click', function() {\n    window.fastlink.open({\n      fastLinkURL: fastLinkURL, //\
+    \ from step 2\n      accessToken: `Bearer ${accessToken}`, // from step 2; do not use the token from step 1 here. \n \
+    \     params: {\n        configName : configName // from step 2\n      },\n      onSuccess: function (data) {\n      \
+    \  // will be called on success. For list of possible message, refer to onSuccess(data) Method.\n        console.log(data);\n\
+    \      },\n      onError: function (data) {\n        // will be called on error. For list of possible message, refer to\
+    \ onError(data) Method.\n        console.log(data);\n      },\n      onClose: function (data) {\n        // will be called\
+    \ called to close FastLink. For list of possible message, refer to onClose(data) Method.\n        console.log(data);\n\
+    \      },\n      onEvent: function (data) {\n        // will be called on intermittent status update.\n        console.log(data);\n\
+    \      }\n    },\n    'container-fastlink');\n  }, false);\n}(window));\n</script>\n```\n\n### Step 4: Additional Configuration\n\
+    The Fastlink widget can be configured to meet your specific needs. For more information on configuration options, see\
+    \ the [Yodlee Fastlink 4 documentation](https://developer.envestnet.com/resources/yodlee/fastlink-4/docs/documentation).\
+    \ \n\nThe Link Money API surfaces the variables required to open any instance of Fastlink 4. However, we do not currently\
+    \ surface any helper functions for customized instances of Fastlink4. However, we also do not restrict you from customizing\
+    \ the Fastlink widget to meet your needs. If you are opening the FL4 for a specific provider, simply alter the base configuration\
+    \ above as you normally would.\n\n"
+components:
+  schemas:
+    Webhook:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: A UUID unique identifier for the webhook.
+        uri:
+          type: string
+          format: uri
+          description: The URI address where the webhook is meant to go.
+        webhookTypes:
+          type: array
+          description: An array of the webhook types that your URI is registered to receive.
+          items:
+            type: string
+            enum:
+            - DATA_UPDATES
+            - REFRESH
+            - AUTO_REFRESH_UPDATES
+            - LATEST_BALANCE_UPDATES
+            - CDV_STATUS_UPDATES
+            - OB_CONSENT
+            - OB_ACTIVE_CONSENT_REMINDER
+            description: The type of webhook you want sent to this URI.
+        webhookDisabled:
+          type: boolean
+          description: A boolean indicating whether the webhook is disabled.
+        status:
+          type:
+          - string
+          - 'null'
+          enum:
+          - HEALTHY
+          - UNHEALTHY
+          description: An enumerator indicating the health status of the webhook; can be null, 'HEALTHY', or 'UNHEALTHY'.
+        lastAttempt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: A timestamp of the last time a webhook was attempted. Can be null if no attempt has been made.
+        lastAttemptStatus:
+          type: integer
+          description: The HTTP response code received at the last attempt. Can be null if no attempt has been made.
+          example: 200
+        lastSuccess:
+          format: date-time
+          type:
+          - string
+          - 'null'
+          description: A timestamp of the last time a webhook was successfully sent (received a 2XX response). Can be null
+            if no successful attempt has been made.
+      required:
+      - id
+      - uri
+      - webhookTypes
+    Client:
+      type: object
+      properties:
+        client:
+          type: object
+          description: The client configuration.
+          properties:
+            clientId:
+              type: string
+              description: Your client ID.
+              example: CLI-12345678-1234-1234-1234-123456789012
+              format: uuid
+            clientName:
+              type: string
+              description: Your registered client name.
+              example: Hairfoot Budgeting
+            clientDescription:
+              type: string
+              description: Your registered client description.
+              example: A budgeting tool for a hardy folk.
+            registrationDate:
+              type: string
+              description: The date your client was registered.
+              example: '2021-01-01T00:00:00Z'
+              format: date-time
+            webhookIds:
+              type: array
+              description: A list of webhook IDs associated with your client.
+              items:
+                type: string
+                description: A webhook ID.
+                format: uuid[]
+                example:
+                - WBK-12345678-1234-1234-1234-123456789012
+            tenants:
+              type: array
+              description: A list of tenant IDs that your client is allowed to access.
+              items:
+                type: string
+                description: A tenant ID.
+                format: uuid[]
+                example:
+                - TNT-12345678-1234-1234-1234-123456789012
+    Tenant:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the tenant for easy identification.
+        tenantId:
+          type: string
+          format: uuid
+          description: The unique identifier for the tenant.
+        clients:
+          type: array
+          description: A list of client IDs that have access to the tenant environment.
+          items:
+            type: string
+      required:
+      - name
+      - tenantId
+      - clients
+  securitySchemes:
+    BearerAuth:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://link-money-dev.fingoal.dev/api/oauth/token
+          scopes:
+            tenantId: Varies according to the tenant you are trying to access.
+security:
+- BearerAuth: []
+paths:
+  /oauth/token:
+    post:
+      summary: Obtain an access token
+      operationId: oauthToken
+      description: 'Obtain an access token using client credentials. The request must include `clientId`, `clientSecret`,
+        and the custom claims `tenantId` and `userId` to specify the tenant and end user the token will represent.
+
+        `tenantId` is only required in cases where you are trying to access a tenant-specific resource. Some routes, like
+        those that let you view and alter your client configuration, do not require a token with this claim. `userId` is only
+        required in cases where you are trying to access a user-specific _and_ tenant-specific resource. Some routes, like
+        those that let you generate new users, do not require a token with this claim, even if they do require a token with
+        a tenant claim.
+
+        '
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                clientId:
+                  type: string
+                clientSecret:
+                  type: string
+                tenantId:
+                  type: string
+                  description: The ID of the tenant the developer wishes to access.
+                userId:
+                  type: string
+                  description: The ID of the end user the developer is acting on behalf of.
+              required:
+              - clientId
+              - clientSecret
+              - tenantId
+      responses:
+        '200':
+          description: A JSON object containing the access token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                  tokenType:
+                    type: string
+                  expiresIn:
+                    type: integer
+                  scope:
+                    type: string
+                    description: The scope(s) for which the token is valid, corresponding to the institution ID.
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+                    description: The error object.
+                    properties:
+                      code:
+                        type: integer
+                        description: The error code.
+                        example: 400
+                      details:
+                        type: array
+                        items:
+                          type: string
+                          description: Details about the error.
+                          example: Expected 'webhookUrl' to be a string, but received 'null' instead.
+                      documentation:
+                        type: string
+                        format: uri
+                        description: A link to the documentation for this error.
+                      received:
+                        type: object
+                        description: The JSON of the payload that we received from you.
+                      expected:
+                        type: object
+                        description: The expected formatting for the JSON the endpoint requires. This varies from endpoint
+                          to endpoint.
+                        example:
+                          field1: string
+                          field2: integer
+                          field3: boolean
+        '401':
+          description: "Unauthorized. The oauth token call can return Unauthorized for the following reasons: \n  - Your client\
+            \ ID is invalid. \n  - Your client secret is invalid. \n  - Your tenant ID is invalid. \n  - Your client is not\
+            \ authorized to access the specified tenant. \n\nThe `details` field in the response body will provide the specific\
+            \ reason why your authentication failed. \n"
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1client/get/responses/401/content/application~1json/schema'
+  /client:
+    get:
+      tags:
+      - Client Management
+      summary: View your Client Configuration.
+      description: "This endpoint returns details about your client's current configuration. \n"
+      operationId: getClient
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          description: Client Configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Client'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+                    description: The error object.
+                    properties:
+                      code:
+                        type: integer
+                        description: The error code.
+                        example: 401
+                      message:
+                        type: string
+                        description: The error message.
+                        example: Unauthorized
+                      details:
+                        type: string
+                        description: Additional details about the error.
+                        example: The client endpoint requires a valid access token. Either none was provided, or the token
+                          provided was invalid. Please check your client credentials and try again.
+  /client/webhooks:
+    get:
+      tags:
+      - Client Management
+      summary: View a list of your currently-configured webhooks.
+      description: "This endpoint returns the full list of webhooks currently configured for your client. \n\nThe list has\
+        \ a default length of 10 items. For additional webhooks, use the `limit` and `offset` parameters to paginate the query.\
+        \ \n"
+      operationId: getWebhooks
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: limit
+        in: query
+        description: The maximum number of webhooks to return.
+        required: false
+        schema:
+          type: integer
+          example: 10
+      - name: offset
+        in: query
+        description: The number of webhooks to skip before returning results.
+        required: false
+        schema:
+          type: integer
+          example: 0
+      responses:
+        '200':
+          description: Webhook List
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  webhooks:
+                    type: array
+                    description: A list of webhooks.
+                    items:
+                      $ref: '#/components/schemas/Webhook'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1client/get/responses/401/content/application~1json/schema'
+    post:
+      summary: Enable a new webhook.
+      operationId: createWebhook
+      tags:
+      - Client Management
+      description: Allows clients to create a new webhook configuration by specifying the URI. The system generates all other
+        fields.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                uri:
+                  type: string
+                  format: uri
+                  pattern: ^https:\/\/
+                  description: The HTTPS URI where the webhook will be sent. Must be a valid HTTPS URL.
+                webhookTypes:
+                  type: array
+                  description: The types of webhooks that you want sent to the specified URI.
+                  items:
+                    type: string
+                    enum:
+                    - DATA_UPDATES
+                    - REFRESH
+                    - AUTO_REFRESH_UPDATES
+                    - LATEST_BALANCE_UPDATES
+                    - CDV_STATUS_UPDATES
+                    - OB_CONSENT
+                    - OB_ACTIVE_CONSENT_REMINDER
+                    description: The type of webhook you want sent to this URI.
+                webhookDisabled:
+                  type: boolean
+                  description: A boolean indicating whether the webhook is disabled.
+      responses:
+        '201':
+          description: Webhook configuration created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  webhook:
+                    $ref: '#/components/schemas/Webhook'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1oauth~1token/post/responses/400/content/application~1json/schema'
+  /client/webhooks/{webhookId}:
+    get:
+      summary: Retrieve a specific webhook
+      tags:
+      - Client Management
+      operationId: getWebhook
+      description: Fetches the details of a specific webhook configuration using its unique identifier.
+      parameters:
+      - name: webhookId
+        in: path
+        required: true
+        description: The UUID of the webhook to retrieve.
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Webhook configuration retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Webhook'
+        '404':
+          description: Webhook with specified ID not found.
+    patch:
+      tags:
+      - Client Management
+      operationId: updateWebhook
+      summary: Update a webhook configuration
+      description: "Use the update webhook endpoint to change details of one of your webhook configurations. Using this endpoint,\
+        \ you can: \n  - Change the URI where the webhook sends data.\n  - Update the types of webhooks you receive.\n  -\
+        \ Temporarily disable the webhook.\n  - Re-enable a disabled webhook.\n"
+      parameters:
+      - name: webhookId
+        in: path
+        required: true
+        description: The unique identifier of the webhook to update.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                uri:
+                  type: string
+                  format: uri
+                  description: The new URI where the webhook will send data.
+                webhookTypes:
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                    - DATA_UPDATES
+                    - REFRESH
+                    - AUTO_REFRESH_UPDATES
+                    - LATEST_BALANCE_UPDATES
+                    - CDV_STATUS_UPDATES
+                    - OB_CONSENT
+                    - OB_ACTIVE_CONSENT_REMINDER
+                  description: The types of webhooks the developer wishes to receive.
+                webhookDisabled:
+                  type: boolean
+                  description: Flag to disable the webhook temporarily.
+      responses:
+        '200':
+          description: Webhook configuration updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Webhook'
+        '400':
+          description: Invalid input, e.g., invalid URI format or invalid enum value for webhookTypes.
+        '404':
+          description: Webhook with specified ID not found.
+    delete:
+      operationId: deleteWebhook
+      tags:
+      - Client Management
+      summary: Delete a webhook configuration
+      description: Deletes a specific webhook configuration and returns the deleted webhook's data.
+      parameters:
+      - name: webhookId
+        in: path
+        required: true
+        description: The unique identifier of the webhook to delete.
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Webhook configuration deleted successfully. Returns the original webhook data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Webhook'
+        '404':
+          description: Webhook with specified ID not found.
+  /client/webhooks/{webhookId}/fire_test_webhook:
+    post:
+      operationId: fireTestWebhook
+      summary: Trigger a test webhook
+      tags:
+      - Client Management
+      description: 'Allows developers to trigger a test webhook event. This sends a dummy payload to the configured URI of
+        the webhook identified by {webhookId}. This helps in verifying the webhook setup.
+
+        '
+      parameters:
+      - name: webhookId
+        in: path
+        required: true
+        description: The unique identifier of the webhook to test.
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Webhook test initiated and response received.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  receivedResponse:
+                    type: boolean
+                    description: Whether a response was received from the webhook endpoint.
+                  responseCode:
+                    type: integer
+                    description: The HTTP response code received from the webhook endpoint. Null if no response was received.
+                  firedAt:
+                    type: string
+                    format: date-time
+                    description: The timestamp when the webhook payload was fired.
+                  receivedAt:
+                    type: string
+                    format: date-time
+                    description: The timestamp when the response from the webhook was received. Null if no response was received.
+                  processingDuration:
+                    type: number
+                    format: float
+                    description: The duration in seconds it took for the webhook to process the request. Calculated as the
+                      difference between receivedAt and firedAt. Null if no response was received.
+                required:
+                - receivedResponse
+                - firedAt
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1client/get/responses/401/content/application~1json/schema'
+        '404':
+          description: Webhook not found.
+  /yodlee/fastlink/get:
+    post:
+      operationId: getFastlinkFourDetails
+      summary: Retrieve FastLink details
+      tags:
+      - Fastlink
+      description: Provides necessary details for developers to integrate FastLink4 into their applications without exposing
+        sensitive credentials. Requires user-level authentication.
+      security:
+      - BearerAuth:
+        - userId
+        - tenantId
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                loginName:
+                  type: string
+                  description: The ID of the user for whom the Fastlink 4 session belongs. This can be any string of your
+                    choosing, although it is best to associate it with the unique identifier in your own system that most
+                    corresponds to one actual individual person.
+              required:
+              - loginName
+      responses:
+        '200':
+          description: FastLink4 details retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fastlinkConfiguration:
+                    type: object
+                    properties:
+                      accessToken:
+                        type: string
+                        description: The user token for the FastLink4 frontend.
+                      fastLinkURL:
+                        type: string
+                        format: uri
+                        description: The tenant-specific URL to embed FastLink4 as an iframe.
+        '401':
+          description: Unauthorized. The user or tenant details are incorrect or do not have the necessary permissions.
+        '403':
+          description: Forbidden. Access is denied due to invalid credentials or access rights.

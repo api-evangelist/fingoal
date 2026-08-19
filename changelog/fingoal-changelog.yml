@@ -1,0 +1,32 @@
+generated: '2026-08-14'
+method: searched
+source: https://fingoal.com/developer-documentation
+published: false
+scheme: null
+current_version: '3.1.3'
+entry_count: 0
+entries: []
+note: >-
+  FinGoal publishes no dated changelog or release notes for either API. The
+  developer landing page links only to the two docs portals, the developer FAQ,
+  and the two account-request forms; neither docs.fingoal.dev nor
+  link-money-docs.fingoal.dev exposes a changelog, release-notes or "what's new"
+  section, and the site navigation on fingoal.com has no such entry. The only
+  version signal available is info.version inside the published OpenAPI: the
+  Insights API is 3.1.3 and the Link Money API is 1.0.0, with no history of what
+  changed between releases. This file records the absence; no ChangeLog pointer
+  is wired into apis.yml because the provider serves no changelog.
+versions_observed:
+- api: fingoal:fingoal-enrichment-api
+  info_version: 3.1.3
+  source: https://docs.fingoal.dev/swagger.json
+- api: fingoal:fingoal-link-money-api
+  info_version: 1.0.0
+  source: https://link-money-docs.fingoal.dev/swagger.json
+evidence:
+- url: https://fingoal.com/developer-documentation
+  status: 200
+  finding: no changelog or release-notes link
+- url: https://fingoal.com/
+  status: 200
+  finding: no changelog entry in navigation or footer

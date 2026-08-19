@@ -1,0 +1,153 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Insights Enrichment API",
+    "version": "3.1.3"
+  },
+  "request": {
+    "auth": {
+      "type": "oauth2",
+      "flow": "client_credentials",
+      "accessTokenUrl": "https://findmoney.fingoal.com/v3/authentication",
+      "credentials": {
+        "clientId": "{{clientId}}",
+        "clientSecret": "{{clientSecret}}"
+      }
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Enrichment",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Test Transaction Enrichment",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://findmoney-dev.fingoal.com/v3/cleanup/sync",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://findmoney.fingoal.com/v3/authentication",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "The test transaction enrichment endpoint provides immediate enrichment on transaction data. This endpoint is ideal for testing API functionality and previewing enrichment results. \n\n**This endpoint is not intended for production use.** Use the historical and streaming endpoints for production-level enrichment.\n\n\nFor optimal performance, adhere to the following limits: \n  - Submit no more than 4 unique users per request. Users are distinguished by the `uid` field in each transaction. \n  - Submit "
+        },
+        {
+          "info": {
+            "name": "Historical Transaction Enrichment",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://findmoney-dev.fingoal.com/v3/cleanup",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://findmoney.fingoal.com/v3/authentication",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "The historical transaction enrichment endpoint is designed for enriching a large number of transactions. It is optimized to handle substantial payloads and efficiently process large backlogs of data.\n\nThis endpoint is asynchronous. A webhook will be sent to the provided URL when a batch of transactions has been enriched.\n    \nTo maximize throughput for this endpoint, follow these guidelines: \n  - Group transactions by `uid` and include all transactions for a single `uid` in the same payload.\n  -"
+        },
+        {
+          "info": {
+            "name": "Streaming Transaction Enrichment",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://findmoney-dev.fingoal.com/v3/cleanup/streaming",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://findmoney.fingoal.com/v3/authentication",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "FinGoal's streaming transaction enrichment endpoint is designed for enriching daily user transactions or other smaller transaction batches. \n\nUnlike the historical transaction enrichment endpoint, the streaming transaction enrichment endpoint does not require any user segmentation. Requests that include many users (by uid) will not deteriorate the endpoint's performance.\n\nThis endpoint is asynchronous. A webhook will be sent to the provided URL when a batch of transactions has been enriched. For"
+        },
+        {
+          "info": {
+            "name": "Base Transaction Enrichment",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://findmoney-dev.fingoal.com/v3/cleanup/base",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://findmoney.fingoal.com/v3/authentication",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "FinGoal's base transaction enrichment endpoint is a new and improved model for enriching daily user, historical, or one off user transactions. It accepts additional `accountTypes` that previous enrichment endpoints did not, including `businessChecking`, `businessSavings`, `businessCreditCard`, `businessLoan`, `loan`, `investments`.\n\nRequests that include many users (by uid) will not deteriorate the endpoint's performance and it has much higher throughput than previous enrichment endpoints. \n\nThi"
+        },
+        {
+          "info": {
+            "name": "Retrieve Enrichment by Batch Request ID",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://findmoney-dev.fingoal.com/v3/cleanup/:batch_request_id",
+            "params": [
+              {
+                "name": "batch_request_id",
+                "value": "",
+                "type": "path",
+                "description": "The Batch Request ID of the enrichment request."
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://findmoney.fingoal.com/v3/authentication",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Developers may use this endpoint in conjunction with the [asynchronous cleanup endpoints](#operation/asyncCleanupTransactions) to retrieve the results of a transaction cleanup operation by its batch operation ID.\nThe operation ID can be extracted from the webhook that the async cleanup endpoint sends when enrichment is complete.  \n"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

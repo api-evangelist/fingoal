@@ -1,6 +1,9 @@
-generated: '2026-07-19'
+generated: '2026-08-14'
 method: searched
-source: openapi/fingoal-insights-openapi-original.json
+source: >-
+  https://docs.fingoal.dev/swagger.json,
+  https://link-money-docs.fingoal.dev/swagger.json,
+  https://fingoal.com/developer-documentation
 docs: https://docs.fingoal.dev/
 versioning:
   scheme: uri-path
@@ -9,17 +12,89 @@ versioning:
   hosts:
     development: https://findmoney-dev.fingoal.com/v3
     production: https://findmoney.fingoal.com/v3
+apis:
+- api: fingoal:fingoal-enrichment-api
+  scheme: uri-path
+  current: v3
+  spec_version: 3.1.3
+  environments:
+    development: https://findmoney-dev.fingoal.com/v3
+    production: https://findmoney.fingoal.com/v3
+- api: fingoal:fingoal-link-money-api
+  scheme: none
+  current: null
+  spec_version: 1.0.0
+  environments:
+    development: https://link-money-dev.fingoal.dev/api
+    production: null
+  note: >-
+    Link Money carries no version segment in its paths and publishes only a
+    development server in servers[]. https://link-money.fingoal.dev answers 200
+    and https://link-money.fingoal.dev/api/oauth/token answers 401 - an
+    authenticated API rather than a 404 - which mirrors the dev/production split
+    FinGoal uses for the Insights API, but FinGoal documents no Link Money
+    production base URL, so none is asserted.
 deprecation:
   policy_url: null
   sunset_header: false
-  note: No published deprecation policy or RFC 8594 Sunset/Deprecation header support found.
+  note: >-
+    No published deprecation policy and no RFC 8594 Sunset/Deprecation header
+    support. FinGoal does mark individual RESPONSE FIELDS deprecated inside the
+    Insights OpenAPI (deprecated_fields below), which is the only deprecation
+    signal a consumer gets; there is no dated timeline attached to any of them
+    and no operation is marked deprecated.
+deprecated_operations: []
+deprecated_fields:
+- field: categoryLabel
+  schemas:
+  - enrichedTransactions[]
+  reason_published: >-
+    "This field is deprecated and not recommended for use, as it may not reflect
+    more correct information available in other 'category' fields."
+- field: isRecurring
+  schemas:
+  - enrichedTransactions[]
+  reason_published: >-
+    "This field is deprecated. Denotes whether the transaction is set to recur on
+    a fixed interval."
+- field: simple_description
+  schemas:
+  - enrichedTransactions[]
+  reason_published: Superseded by simpleDescription (camelCase), which carries the same value.
 sla:
   url: null
   uptime_target: null
 status_page: null
-deprecated_operations: []
+status_page_probe:
+  url: https://status.fingoal.com
+  result: does-not-resolve
+changelog:
+  published: false
+  see: changelog/fingoal-changelog.yml
+support:
+  channels:
+  - Slack (preferred, for existing customers)
+  - support@fingoal.com (include company name in the subject line)
+  contact_page: https://fingoal.com/contact
+  source: https://fingoal.com/developer-faqs
+onboarding:
+  model: reviewed-request
+  url: https://fingoal.com/request-developer-account
+  turnaround: development credentials within 24 hours (Insights API)
 notes: >-
-  FinGoal versions the Insights API in the URI path (currently /v3). No public
-  status page (status.fingoal.com does not resolve), SLA page, or dated
-  changelog was found during enrichment. Credentials and environments are split
-  dev (findmoney-dev) vs production (findmoney).
+  FinGoal versions the Insights API in the URI path (currently /v3). Link Money
+  is unversioned at 1.0.0. There is still no public status page
+  (status.fingoal.com does not resolve), no SLA page, and no dated changelog for
+  either API. Credentials and environments are split dev vs production on the
+  Insights API (findmoney-dev vs findmoney); Link Money publishes only a dev
+  host.
+evidence:
+- url: https://docs.fingoal.dev/swagger.json
+  status: 200
+- url: https://link-money-docs.fingoal.dev/swagger.json
+  status: 200
+- url: https://status.fingoal.com
+  status: 0
+  finding: DNS does not resolve
+- url: https://fingoal.com/developer-faqs
+  status: 200

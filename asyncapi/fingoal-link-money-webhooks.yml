@@ -1,0 +1,71 @@
+generated: '2026-08-14'
+method: searched
+source: https://link-money-docs.fingoal.dev/swagger.json
+docs: https://link-money-docs.fingoal.dev/
+spec_type: Webhooks
+api: fingoal:fingoal-link-money-api
+note: >-
+  Link Money documents a webhook event surface but publishes no AsyncAPI
+  document. Webhooks are self-service here, unlike the Insights API: a client
+  registers a callback with POST /client/webhooks, listing the event types it
+  wants, and Link Money tracks delivery health on the registration itself. The
+  event-type enumeration below is taken verbatim from the webhookTypes enum in
+  the published Link Money OpenAPI; Link Money proxies Yodlee, so these are the
+  aggregation events that reach the developer. Individual event PAYLOAD schemas
+  are not published in the Link Money spec - only the event names - so no payload
+  shape is asserted here.
+management_operations:
+- getWebhooks
+- createWebhook
+- getWebhook
+- updateWebhook
+- deleteWebhook
+- fireTestWebhook
+events:
+- webhook_type: DATA_UPDATES
+  trigger: Aggregated financial data for a linked account has been updated.
+- webhook_type: REFRESH
+  trigger: An account refresh has completed.
+- webhook_type: AUTO_REFRESH_UPDATES
+  trigger: An automatic (scheduled) refresh has produced updates.
+- webhook_type: LATEST_BALANCE_UPDATES
+  trigger: The latest balance for a linked account has changed.
+- webhook_type: CDV_STATUS_UPDATES
+  trigger: Account (CDV) verification status has changed.
+- webhook_type: OB_CONSENT
+  trigger: An open-banking consent event occurred.
+- webhook_type: OB_ACTIVE_CONSENT_REMINDER
+  trigger: A reminder that an active open-banking consent needs attention.
+registration:
+  operation: createWebhook
+  endpoint: POST /client/webhooks
+  fields:
+  - uri
+  - webhookTypes
+  - webhookDisabled
+  uri_constraint: Must match ^https:\/\/ - HTTPS only.
+delivery:
+  transport: https-post
+  target: uri (per webhook registration)
+  test_operation: fireTestWebhook
+  test_endpoint: POST /client/webhooks/{webhookId}/fire_test_webhook
+health_tracking:
+  note: >-
+    Link Money exposes delivery health on the webhook record itself, which is
+    unusual and useful - a consumer can read whether its own endpoint is failing
+    without instrumenting anything.
+  fields:
+  - field: status
+    values:
+    - HEALTHY
+    - UNHEALTHY
+    nullable: true
+  - field: lastAttempt
+    description: Timestamp of the last delivery attempt.
+  - field: lastAttemptStatus
+    description: HTTP response code received on the last attempt.
+  - field: lastSuccess
+    description: Timestamp of the last delivery that received a 2XX response.
+evidence:
+- url: https://link-money-docs.fingoal.dev/swagger.json
+  status: 200

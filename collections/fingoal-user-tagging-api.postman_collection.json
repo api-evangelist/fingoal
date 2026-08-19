@@ -1,0 +1,729 @@
+{
+  "item": [
+    {
+      "id": "8625fb55-04dc-4d25-8af3-cf78ee762d0d",
+      "name": "User Tagging",
+      "description": {
+        "content": "markdown/tagging.md",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "4254860c-20d0-42ec-a396-63386046345a",
+          "name": "Get a User",
+          "request": {
+            "name": "Get a User",
+            "description": {
+              "content": "<strong style=\"color:red;\">This endpoint runs on data sent to the Transaction Enrichment endpoints. Tagging is run in batches twice daily and thus not available immediately after posting transactions. Also, in order to receive user tags, transaction dates must be within the past 90 days.</strong>\n<br/>\n<br />\nFetches user and transaction tags for a specified user ID. Both endpoints return the same schema. Use the sync keyword to trigger a manual update on the transaction and user tags for a single user.\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "users",
+                ":userId"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "userId",
+                  "description": "(Required) The ID for the user you want to retrieve."
+                }
+              ]
+            },
+            "header": [
+              {
+                "disabled": false,
+                "key": "include_tagged_transactions",
+                "value": "<string>",
+                "description": ""
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "scope",
+                  "value": "enrichment"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "https://findmoney.fingoal.com/v3/authentication"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "client_credentials"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "92193125-5e55-4a3d-b5eb-c546d40c72b5",
+              "name": "Success",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "users",
+                    ":userId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "userId",
+                      "description": "(Required) The ID for the user you want to retrieve."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  },
+                  {
+                    "disabled": false,
+                    "key": "include_tagged_transactions",
+                    "value": "<string>",
+                    "description": ""
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"user\": {\n    \"uid\": \"string\",\n    \"client_id\": \"string\",\n    \"id\": \"string\",\n    \"uniqueId\": \"string\",\n    \"lifetimeSavings\": 846.9222869472459,\n    \"registrationDate\": \"2016-01-05T04:08:49.837Z\",\n    \"subtenantId\": \"string\",\n    \"tags\": [\n      \"string\",\n      \"string\"\n    ],\n    \"totaltransactions\": 6147.310776175421,\n    \"transactionsSinceLastUpdate\": 3001.399915618397\n  },\n  \"transactions\": [\n    {\n      \"transaction_id\": \"string\",\n      \"simple_description\": \"string\",\n      \"original_description\": \"string\",\n      \"category\": \"string\",\n      \"amount\": 8905.537481646898,\n      \"date\": \"1974-09-27T11:19:39.810Z\",\n      \"tags\": [\n        \"string\",\n        \"string\"\n      ]\n    },\n    {\n      \"transaction_id\": \"string\",\n      \"simple_description\": \"string\",\n      \"original_description\": \"string\",\n      \"category\": \"string\",\n      \"amount\": 6699.862192388475,\n      \"date\": \"1977-08-30T01:47:13.722Z\",\n      \"tags\": [\n        \"string\",\n        \"string\"\n      ]\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "9f45e313-ac82-433f-aac7-2a6fcc00ef8b",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "users",
+                    ":userId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "userId",
+                      "description": "(Required) The ID for the user you want to retrieve."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  },
+                  {
+                    "disabled": false,
+                    "key": "include_tagged_transactions",
+                    "value": "<string>",
+                    "description": ""
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "9de915ee-0069-46b0-a03e-31cec495d5f7",
+              "name": "User ID could not be found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "users",
+                    ":userId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "userId",
+                      "description": "(Required) The ID for the user you want to retrieve."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  },
+                  {
+                    "disabled": false,
+                    "key": "include_tagged_transactions",
+                    "value": "<string>",
+                    "description": ""
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "0f98414b-36c0-4752-91a5-a650786bb9bd",
+          "name": "Trigger a User Tag Update",
+          "request": {
+            "name": "Trigger a User Tag Update",
+            "description": {
+              "content": "<strong style=\"color:red;\">This endpoint runs on data sent to the Transaction Enrichment endpoints. Tagging is run in batches twice daily and thus not available immediately after posting transactions. Also, in order to receive user tags, transaction dates must be within the past 90 days.</strong>\n<br/>\n<br />\nFetches user and transaction tags for a specified user ID. Both endpoints return the same schema. Use the sync keyword to trigger a manual update on the transaction and user tags for a single user.\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "users",
+                ":userId",
+                "sync"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "userId",
+                  "description": "(Required) The ID for the user you want to retrieve."
+                }
+              ]
+            },
+            "header": [
+              {
+                "disabled": false,
+                "key": "include_tagged_transactions",
+                "value": "<string>",
+                "description": ""
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "scope",
+                  "value": "enrichment"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "https://findmoney.fingoal.com/v3/authentication"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "client_credentials"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "cd7da9e0-d31f-466e-b457-e30a18e5b1b3",
+              "name": "Success",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "users",
+                    ":userId",
+                    "sync"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "userId",
+                      "description": "(Required) The ID for the user you want to retrieve."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  },
+                  {
+                    "disabled": false,
+                    "key": "include_tagged_transactions",
+                    "value": "<string>",
+                    "description": ""
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "175ed5a7-d205-46aa-ae10-c6c3ff3f129b",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "users",
+                    ":userId",
+                    "sync"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "userId",
+                      "description": "(Required) The ID for the user you want to retrieve."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  },
+                  {
+                    "disabled": false,
+                    "key": "include_tagged_transactions",
+                    "value": "<string>",
+                    "description": ""
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "c7c9832b-a02f-4e51-81e2-eb3bcde8d1a0",
+              "name": "User ID could not be found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "users",
+                    ":userId",
+                    "sync"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "userId",
+                      "description": "(Required) The ID for the user you want to retrieve."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  },
+                  {
+                    "disabled": false,
+                    "key": "include_tagged_transactions",
+                    "value": "<string>",
+                    "description": ""
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "274836d3-ad6c-4010-b753-debbe3a7fe80",
+          "name": "Retrieve Updated Tags",
+          "request": {
+            "name": "Retrieve Updated Tags",
+            "description": {
+              "content": "If you subscribe to the user tag status updates, you can retrieve them from this endpoint with the `guid` you received from the status update webhook. The tag updates will stay live at this endpoint for 24 hours. \n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "users",
+                "tags",
+                ":guid"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "guid",
+                  "description": "(Required) The guid for the updates you want to retrieve."
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "scope",
+                  "value": "enrichment"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "https://findmoney.fingoal.com/v3/authentication"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "client_credentials"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "c787d0aa-234f-460a-8fae-db6d6f359369",
+              "name": "Success",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "users",
+                    "tags",
+                    ":guid"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "guid",
+                      "description": "(Required) The guid for the updates you want to retrieve."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"tenant_id\": \"string\",\n  \"userTags\": {\n    \"created\": [\n      {\n        \"user_id\": \"409088\",\n        \"user_tag_id\": 61,\n        \"tag_name\": \"Home Improvement Loan\"\n      },\n      {\n        \"user_id\": \"409088\",\n        \"user_tag_id\": 61,\n        \"tag_name\": \"Home Improvement Loan\"\n      }\n    ],\n    \"deleted\": [\n      {\n        \"user_id\": \"409088\",\n        \"user_tag_id\": 46,\n        \"tag_name\": \"Movie Goer\"\n      },\n      {\n        \"user_id\": \"409088\",\n        \"user_tag_id\": 46,\n        \"tag_name\": \"Movie Goer\"\n      }\n    ],\n    \"modified\": [\n      {\n        \"user_id\": \"409088\",\n        \"user_tag_id\": 46,\n        \"tag_name\": \"Movie Goer\",\n        \"previous_value\": 50,\n        \"new_value\": 75,\n        \"delta\": 25\n      },\n      {\n        \"user_id\": \"409088\",\n        \"user_tag_id\": 46,\n        \"tag_name\": \"Movie Goer\",\n        \"previous_value\": 50,\n        \"new_value\": 75,\n        \"delta\": 25\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "00089d99-04bb-4a7d-904d-207224ccf96e",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "users",
+                    "tags",
+                    ":guid"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "guid",
+                      "description": "(Required) The guid for the updates you want to retrieve."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "2e81e9ba-7550-40fc-b340-e2482ad27d7c",
+              "name": "User ID could not be found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "users",
+                    "tags",
+                    ":guid"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "guid",
+                      "description": "(Required) The guid for the updates you want to retrieve."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: oauth2",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://findmoney-dev.fingoal.com/v3",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "oauth2",
+    "oauth2": [
+      {
+        "key": "scope",
+        "value": "enrichment"
+      },
+      {
+        "key": "accessTokenUrl",
+        "value": "https://findmoney.fingoal.com/v3/authentication"
+      },
+      {
+        "key": "grant_type",
+        "value": "client_credentials"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "aa7798fe-a453-4043-9352-14d98dc85758",
+    "name": "Insights Enrichment User Tagging API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "# Overview\n[Download our postman collection here.](https://fingoal.dev/FinGoal%20Enrichment.postman_collection.json)\n\nThe Insights API provides developers with tools to enhance their transaction, account, and user data with deep enrichment. Although the information returned by the Insights API can be utilized in various ways and implementations may differ, the initial steps for using the API are consistent: \n1. Request a FinGoal developer account.\n2. Obtain API access credentials.\n3. Generate an Insights API authentication token. \n4. Submit transactions to the Insights API. \n5. Register for Webhooks.\n6. Request Enrichment.\n\n## Important Resources\n- [Complete Insights API Tag Registry](https://fingoal.com/tags-list)\n- [Complete Insights API Categorization Spreadsheet](https://docs.google.com/spreadsheets/d/1jnmw1LriclC3bO-oC7f7EkhmfCL7gw2LQLX8zay1vXw/edit?gid=0#gid=0)\n\n## Request a FinGoal Developer Account\nTo use the Insights API, you need authentication credentials. These credentials can be obtained by <a href=\"https://fingoal.com/request-developer-account\" target=\"_blank\"> requesting a FinGoal developer account</a>. FinGoal developer support will send you development environment credentials within 24 hours. These credentials are required for the quickstart. \n# Quickstart\n## Generate a JWT Authentication Token\nAll Insights API endpoints require an `Authorization` header with a `Bearer` token. This token is a JSON Web Token (JWT) generated by the Insights API authentication endpoint. To generate this token, you will need the `client_id` and `client_secret` provided when you requested a FinGoal developer account. \n\n### 1. Prepare the Request Body\nThe request body is a JSON object with the following structure:\n```json\n{\n\t\"client_id\": \"{YOUR_CLIENT_ID}\",\n\t\"client_secret\": \"{YOUR_CLIENT_SECRET}\"\n} \n```\n### 2. Make a POST Request\nMake a POST request to the Insights API authentication endpoint using the prepared JSON object.\n```js\nconst body = {\n  \"client_id\": \"{YOUR_CLIENT_ID}\",\n  \"client_secret\": \"{YOUR_CLIENT_SECRET}\"\n}\n\nconst requestOptions = {\n  method: 'POST',\n  body: body,\n};\n\ntry {\n\tconst response = await fetch(\"https://findmoney-dev.fingoal.com/v3/authentication\", requestOptions);\n  const data = response.json();\n\tconst { access_token } = data;\n\tconsole.log({ access_token });\n} catch(error) {\n\tconsole.log('AUTHENTICATION_ERROR:', error);\n}\n```\nThe JavaScript code above uses the `fetch` API to request an access token. If the request succeeds, it extracts the access_token from the response body. If an error occurs, it logs the error. \n\n### Successful Response\nIf the request is successful, the response body will contain a JSON object with the following structure:\n- `access_token`: The JWT token used to authenticate requests to the Insights API.\n- `scope`: The permissions that the token has.\n- `expires_in`: The number of seconds until the token expires (always 86400 seconds, or 24 hours). \n- `token_type`: The type of token. This value is always `Bearer`.\n```json\n{\n    \"access_token\": \"eyJh...\",\n    \"scope\": \"read:transactions write:transactions ...\",\n    \"expires_in\": 86400,\n    \"token_type\": \"Bearer\"\n}\n```\n### Best Practices \n- Store the `access_token` securely. Do not expose it in client-side code.\n- Use the `expires_in` value to determine when to refresh the token.\n- Regenerate a new token only after the current token has expired.\n\n## Include the JWT Token in Requests\nTo authenticate your requests to the Insights API, you must include the JWT token in the `Authorization` header. The header should have the following structure:\n```json\n{\n  \"Authorization\": \"Bearer {YOUR_ACCESS_TOKEN}\"\n}\n```\nThis header will successfully authenticate any request to the Insights API. You can now proceed to the enrichment, tagging, or savings recommendations quickstarts to integrate the Insights API into your application.\n\n## Tenancy \nInsights API supports the concept of tenancy. A `tenant` refers to a grouping of customer data (users, transactions, tags, accounts, etc.) that may be accessible to multiple clients. By default, a new client’s connection to the InsightsAPI does not use tenancy; however, they may enable tenancy at any time.\n\nCurrently, Insights API does not allow you to create custom tenants. The FinGoal customer support team needs to coordinate with both the client & tenant parties to set up a new connection. If a client’s request for access to a tenant is approved, FinGoal will send the client an identifier for the tenant, and authorize them to access that tenant’s resources. \n\nTo interact with the Insights API on behalf of a tenant, include a tenant_id in your Insights API token request: \n\n```js\nconst response = await fetch(\"{INSIGHTS_API_BASE_URL}/v3/authentication\", {\n\t\tmethod: \"POST\",\n\t\tdata: {\n\t\t\t\tclient_id: \"{MY_CLIENT_ID}\",\n\t\t\t\tclient_secret: \"{MY_CLIENT_SECRET}\",\n\t\t\t\ttenant_id: \"{TENANT_ID_FROM_FINGOAL}\"\n\t\t}\n});\n```\n\nBy including the `tenant_id` in your token scopes, the generated token allows you to: \n\n- Write data to the tenant’s environment.\n- Read data from the tenant’s environment.\n\n<aside>\nIf you do not include a tenant ID, your token will only allow you to access data you have created without a specific tenant association. \n</aside>\n\nAs soon as you are successfully added to a tenant’s data silo, you will begin receiving webhook updates for all activity in that silo. Note that this may include new enrichment data that is added to the environment by clients other than yourself. Refer to the webhook documentation for more information on the content of Insights API webhooks.",
+      "type": "text/plain"
+    }
+  }
+}

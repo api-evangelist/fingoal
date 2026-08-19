@@ -1,7 +1,12 @@
-generated: '2026-07-19'
+generated: '2026-08-14'
 method: derived
-source: openapi/fingoal-insights-openapi-original.json
+source: >-
+  openapi/_original/fingoal-insights-openapi-original.json,
+  openapi/_original/fingoal-link-money-openapi-original.json
 docs: https://docs.fingoal.dev/
+scope: >-
+  entities[]/relationships[] describe the Insights API. The Link Money API has a
+  separate, smaller model, captured under link_money below.
 entities:
 - name: EnrichmentBatch
   description: >-
@@ -61,3 +66,67 @@ relationships:
   to: User
   type: references
   via: tenant_id (USER_TAGS_DATA notification payload)
+link_money:
+  api: fingoal:fingoal-link-money-api
+  source: openapi/_original/fingoal-link-money-openapi-original.json
+  id_prefixes:
+  - prefix: CLI-
+    entity: Client
+  - prefix: TNT-
+    entity: Tenant
+  - prefix: WBK-
+    entity: Webhook
+  note: >-
+    Link Money's model is a three-entity access-control graph, not a data graph.
+    Client and Tenant are many-to-many - a client lists the tenants it may reach
+    and a tenant lists the clients allowed in - which is the whole point of the
+    product: one aggregation instance per bank, several fintech partners
+    authenticated against it. The aggregated financial data itself lives in the
+    proxied Yodlee Core API and is not modelled in FinGoal's OpenAPI.
+  entities:
+  - name: Client
+    description: A registered Link Money developer client.
+    identifier: clientId
+    fields:
+    - clientId
+    - clientName
+    - clientDescription
+    - registrationDate
+    - webhookIds
+    - tenants
+  - name: Tenant
+    description: >-
+      A bank or financial institution's siloed aggregation environment. Tokens
+      are scoped to exactly one tenant.
+    identifier: tenantId
+    fields:
+    - name
+    - tenantId
+    - clients
+  - name: Webhook
+    description: >-
+      A registered HTTPS callback for a set of aggregation event types, carrying
+      its own delivery-health state.
+    identifier: id
+    fields:
+    - id
+    - uri
+    - webhookTypes
+    - webhookDisabled
+    - status
+    - lastAttempt
+    - lastAttemptStatus
+    - lastSuccess
+  relationships:
+  - from: Client
+    to: Tenant
+    type: has_many
+    via: tenants
+  - from: Tenant
+    to: Client
+    type: has_many
+    via: clients
+  - from: Client
+    to: Webhook
+    type: has_many
+    via: webhookIds

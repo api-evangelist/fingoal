@@ -1,0 +1,75 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for FinGoal Link Money API
+  version: 1.0.0
+extends: openapi/_original/fingoal-link-money-openapi-original.json
+actions:
+- target: $.info
+  update:
+    x-apievangelist-enriched: '2026-08-14'
+    x-apievangelist-source: https://link-money-docs.fingoal.dev/swagger.json
+    x-apievangelist-ownership: >-
+      Ownership confirmed: the spec is served from fingoal.dev, FinGoal's own
+      docs domain (the same host family as docs.fingoal.dev), info.title is
+      "Link Money API", servers[] is link-money-dev.fingoal.dev, and Link Money
+      is the product FinGoal markets at https://fingoal.com/link-money and links
+      from its own developer landing page at
+      https://fingoal.com/developer-documentation. Sign-up for it routes to
+      FinGoal's own https://fingoal.com/request-developer-account and support to
+      support@fingoal.com.
+    x-apievangelist-artifacts:
+    - authentication/fingoal-authentication.yml
+    - conventions/fingoal-conventions.yml
+    - asyncapi/fingoal-link-money-webhooks.yml
+    - components/fingoal-components.yml
+    - rate-limits/fingoal-rate-limits.yml
+    - lifecycle/fingoal-lifecycle.yml
+- target: $.info
+  update:
+    x-apievangelist-path-prefix-note: >-
+      The published servers[] entry is https://link-money-dev.fingoal.dev while
+      every request example in the same document targets
+      https://link-money-dev.fingoal.dev/api/... - the operation paths are served
+      under an /api prefix that servers[] omits. Recorded, not corrected: the
+      original servers[] block is left untouched.
+- target: $.info
+  update:
+    x-apievangelist-environments-note: >-
+      Only a development server is published. https://link-money.fingoal.dev
+      answers 200 and https://link-money.fingoal.dev/api/oauth/token answers 401
+      (an authenticated API, not a 404), which is consistent with the
+      dev/production split FinGoal uses for the Insights API
+      (findmoney-dev.fingoal.com vs findmoney.fingoal.com), but FinGoal does not
+      document a Link Money production base URL anywhere. Not asserted as the
+      base URL.
+- target: $.info
+  update:
+    x-apievangelist-auth-note: >-
+      POST /api/oauth/token with {clientId, clientSecret, tenantId} returns
+      {token}. The JWT is valid for 1 hour and is scoped to a SINGLE tenant - a
+      separate token must be minted per tenant. Sent as Authorization: Bearer.
+- target: $.info
+  update:
+    x-apievangelist-webhooks:
+    - DATA_UPDATES
+    - REFRESH
+    - AUTO_REFRESH_UPDATES
+    - LATEST_BALANCE_UPDATES
+    - CDV_STATUS_UPDATES
+    - OB_CONSENT
+    - OB_ACTIVE_CONSENT_REMINDER
+- target: $.paths['/yodlee/fastlink/get'].post
+  update:
+    x-apievangelist-component-note: >-
+      Returns the accessToken + fastLinkURL pair consumed by the third-party
+      Yodlee FastLink 4 iframe widget
+      (https://cdn.yodlee.com/fastlink/v4/initialize.js). See
+      components/fingoal-components.yml.
+- target: $.info
+  update:
+    x-apievangelist-proxy-note: >-
+      Beyond the operations enumerated in this document, Link Money is a direct
+      proxy to the Yodlee Core API - FinGoal's docs say the aggregation
+      endpoints are surfaced "unaltered", with the user's loginName moved into a
+      request HEADER. Those proxied operations are NOT described in this
+      OpenAPI, so the machine-readable surface is narrower than the callable one.

@@ -1,6 +1,8 @@
-generated: '2026-07-19'
+generated: '2026-08-14'
 method: generated
-source: openapi/fingoal-insights-openapi-original.json
+source: >-
+  openapi/_original/fingoal-insights-openapi-original.json,
+  openapi/_original/fingoal-link-money-openapi-original.json
 skills:
 - file: fingoal-enrich-transactions.md
   name: Enrich a batch of transactions with FinGoal
@@ -24,3 +26,21 @@ skills:
   - upsertWebhookConfiguration
   - testWebhook
   - deleteWebhookConfiguration
+- file: fingoal-link-money-account-linking.md
+  name: Link a bank account with FinGoal Link Money
+  api: openapi/_original/fingoal-link-money-openapi-original.json
+  operations:
+  - oauthToken
+  - getFastlinkFourDetails
+  - getClient
+- file: fingoal-link-money-webhooks.md
+  name: Manage FinGoal Link Money webhooks
+  api: openapi/_original/fingoal-link-money-openapi-original.json
+  operations:
+  - oauthToken
+  - getWebhooks
+  - createWebhook
+  - getWebhook
+  - fireTestWebhook
+  - updateWebhook
+  - deleteWebhook

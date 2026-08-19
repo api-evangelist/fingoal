@@ -1,6 +1,9 @@
-generated: '2026-07-19'
+generated: '2026-08-14'
 method: searched
-source: openapi/fingoal-insights-openapi-original.json
+source: >-
+  openapi/_original/fingoal-insights-openapi-original.json,
+  openapi/_original/fingoal-link-money-openapi-original.json,
+  https://fingoal.com/fingoal-privacy-security
 docs: https://fingoal.com/fingoal-privacy-security
 standards:
 - id: oauth2-client-credentials
@@ -32,3 +35,55 @@ standards:
   evidence: >-
     FinGoal states it never transmits or holds account numbers, passwords, or
     card numbers; no PCI DSS claim published.
+- id: open-banking
+  conforms: true
+  evidence: >-
+    Link Money brokers open-banking connections and its webhook catalog carries
+    consent events (OB_CONSENT, OB_ACTIVE_CONSENT_REMINDER). FinGoal's developer
+    FAQ describes open-banking registration timelines and a typical 365-day
+    lookback. This is participation via the Yodlee aggregation layer FinGoal
+    proxies, not certification against a named open-banking standard body.
+- id: fdx
+  conforms: false
+  evidence: >-
+    No FDX claim, FDX-shaped resource model, or FDX conformance statement appears
+    in either OpenAPI or anywhere on fingoal.com.
+- id: idempotency
+  conforms: false
+  evidence: >-
+    Neither API documents an Idempotency-Key header or an idempotent-retry
+    contract. See conventions/fingoal-conventions.yml.
+- id: rate-limit-headers
+  conforms: false
+  evidence: >-
+    No RFC-draft RateLimit-* or vendor X-RateLimit-* headers and no 429 response
+    are described in either OpenAPI. See rate-limits/fingoal-rate-limits.yml.
+- id: rfc8594-sunset
+  conforms: false
+  evidence: >-
+    No Sunset or Deprecation header support and no deprecation policy published;
+    field-level `deprecated: true` markers exist in the Insights schemas with no
+    attached timeline. See lifecycle/fingoal-lifecycle.yml.
+apis:
+- api: fingoal:fingoal-link-money-api
+  standards:
+  - id: openapi-3.1
+    conforms: true
+    evidence: >-
+      https://link-money-docs.fingoal.dev/swagger.json is openapi 3.1.0 with 6
+      paths / 9 operations, info.version 1.0.0.
+  - id: oauth2-client-credentials
+    conforms: partial
+    evidence: >-
+      securitySchemes declares oauth2 clientCredentials, but the token endpoint
+      is not RFC 6749 shaped - it takes JSON {clientId, clientSecret, tenantId}
+      and returns {token}, not {access_token, token_type, expires_in}.
+  - id: webhooks
+    conforms: true
+    evidence: >-
+      Self-service webhook CRUD at /client/webhooks with a seven-value
+      webhookTypes enum, HTTPS-only URIs, a test-fire operation, and per-
+      registration delivery-health fields.
+  - id: rfc9457-problem-details
+    conforms: false
+    evidence: Error responses are plain JSON objects, not application/problem+json.

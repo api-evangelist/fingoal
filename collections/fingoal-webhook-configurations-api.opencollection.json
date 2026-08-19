@@ -1,0 +1,121 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Insights Enrichment Webhook Configurations API",
+    "version": "3.1.3"
+  },
+  "request": {
+    "auth": {
+      "type": "oauth2",
+      "flow": "client_credentials",
+      "accessTokenUrl": "https://findmoney.fingoal.com/v3/authentication",
+      "credentials": {
+        "clientId": "{{clientId}}",
+        "clientSecret": "{{clientSecret}}"
+      }
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Webhook Configurations",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Webhook Configurations",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://findmoney-dev.fingoal.com/v3/webhook-configurations",
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://findmoney.fingoal.com/v3/authentication",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Retrieve all webhook configurations for your client. Configurations are organized into:\n- **default**: Configurations without a tenant_id that apply to your client's default callback URL\n- **tenants**: Tenant-specific configurations organized by tenant_id\n"
+        },
+        {
+          "info": {
+            "name": "Create or Update Webhook Configuration",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://findmoney-dev.fingoal.com/v3/webhook-configurations",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://findmoney.fingoal.com/v3/authentication",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Create a new webhook configuration or update an existing one. Your `client_id` and `tenant_id` are automatically inferred from the bearer token on this request. To set up a webhook for a specific tenant, please ensure that the bearer token on this request as a `tenant_id` claim. If your bearer token lacks a `tenant_id`, the webhook will be created for your single-tenant environment.\n\n- If a configuration already exists for the same client/tenant/webhook_type combination, it will be updated.\n- If"
+        },
+        {
+          "info": {
+            "name": "Delete Webhook Configuration",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://findmoney-dev.fingoal.com/v3/webhook-configurations",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://findmoney.fingoal.com/v3/authentication",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Remove a webhook configuration.\n\n- Specify `tenant_id` to delete a tenant-specific configuration.\n- Omit `tenant_id` to delete the default configuration.\n"
+        },
+        {
+          "info": {
+            "name": "Test Webhook",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://findmoney-dev.fingoal.com/v3/webhook-configurations/test",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://findmoney.fingoal.com/v3/authentication",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "Test your webhook endpoint by triggering a sample payload. Useful for verifying your webhook receiver is working correctly.\n\nThe test payload varies by webhook type:\n- **ENRICHMENT_DATA**: Sample enriched transactions payload\n- **ENRICHMENT_NOTIFICATION**: Sample batch notification with batch_request_id\n- **USER_TAGS_DATA**: Sample user tags payload with created/deleted/modified arrays\n- **USER_TAGS_NOTIFICATION**: Sample notification with guid\n- **INSIGHTS**: Sample finsights array\n\nAll test we"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

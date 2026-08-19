@@ -1,0 +1,45 @@
+generated: '2026-08-14'
+method: searched
+source: >-
+  registry.npmjs.org search + package lookups, pypi.org, rubygems.org,
+  crates.io, github.com/fingoal repo list, github.com search, and the FinGoal
+  developer documentation index (https://fingoal.com/developer-documentation)
+package_count: 0
+packages: []
+note: >-
+  FinGoal publishes no first-party client libraries. The npm registry search for
+  "fingoal" returns 0 objects; registry.npmjs.org/fingoal, /@fingoal/sdk and
+  /link-money, pypi.org/pypi/fingoal/json and rubygems.org gems/fingoal.json all
+  return 404. The github.com/fingoal organisation holds only demo and internal
+  repos (core-api-swagger-documentation, basic-switch-app, env-switchkit,
+  cdp-linkmoney-demo, Instant-Account-Verification-Quickstart,
+  FinGoal-Symitar-Extractor, webhook-verification-test, CU-Build-Workshop) and no
+  SDK. Every other "fingoal" repo on GitHub belongs to an unrelated personal
+  project of the same name. The published integration surface is the raw HTTP API
+  plus a downloadable Postman collection; the only client-side library in any
+  FinGoal flow is Yodlee's third-party FastLink 4 loader, recorded in
+  components/fingoal-components.yml rather than here because it is not a FinGoal
+  package.
+registries_checked:
+- registry: npm
+  query: https://registry.npmjs.org/-/v1/search?text=fingoal
+  status: 200
+  results: 0
+- registry: npm
+  query: https://registry.npmjs.org/fingoal
+  status: 404
+- registry: pypi
+  query: https://pypi.org/pypi/fingoal/json
+  status: 404
+- registry: rubygems
+  query: https://rubygems.org/api/v1/gems/fingoal.json
+  status: 404
+- registry: crates.io
+  query: https://crates.io/api/v1/crates/fingoal
+  status: 403
+  note: crates.io rejected the unauthenticated request; no FinGoal crate is referenced anywhere in the docs.
+- registry: github
+  query: https://api.github.com/orgs/fingoal/repos
+  status: 200
+  results: 9
+  note: demos and internal tooling only, no client library

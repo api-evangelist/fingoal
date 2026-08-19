@@ -1,0 +1,125 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Insights Enrichment User Tagging API",
+    "version": "3.1.3"
+  },
+  "request": {
+    "auth": {
+      "type": "oauth2",
+      "flow": "client_credentials",
+      "accessTokenUrl": "https://findmoney.fingoal.com/v3/authentication",
+      "credentials": {
+        "clientId": "{{clientId}}",
+        "clientSecret": "{{clientSecret}}"
+      }
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "User Tagging",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get a User",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://findmoney-dev.fingoal.com/v3/users/:userId",
+            "headers": [
+              {
+                "name": "include_tagged_transactions",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "userId",
+                "value": "",
+                "type": "path",
+                "description": "The ID for the user you want to retrieve."
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://findmoney.fingoal.com/v3/authentication",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "<strong style=\"color:red;\">This endpoint runs on data sent to the Transaction Enrichment endpoints. Tagging is run in batches twice daily and thus not available immediately after posting transactions. Also, in order to receive user tags, transaction dates must be within the past 90 days.</strong>\n<br/>\n<br />\nFetches user and transaction tags for a specified user ID. Both endpoints return the same schema. Use the sync keyword to trigger a manual update on the transaction and user tags for a sing"
+        },
+        {
+          "info": {
+            "name": "Trigger a User Tag Update",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://findmoney-dev.fingoal.com/v3/users/:userId/sync",
+            "headers": [
+              {
+                "name": "include_tagged_transactions",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "userId",
+                "value": "",
+                "type": "path",
+                "description": "The ID for the user you want to retrieve."
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://findmoney.fingoal.com/v3/authentication",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "<strong style=\"color:red;\">This endpoint runs on data sent to the Transaction Enrichment endpoints. Tagging is run in batches twice daily and thus not available immediately after posting transactions. Also, in order to receive user tags, transaction dates must be within the past 90 days.</strong>\n<br/>\n<br />\nFetches user and transaction tags for a specified user ID. Both endpoints return the same schema. Use the sync keyword to trigger a manual update on the transaction and user tags for a sing"
+        },
+        {
+          "info": {
+            "name": "Retrieve Updated Tags",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://findmoney-dev.fingoal.com/v3/users/tags/:guid",
+            "params": [
+              {
+                "name": "guid",
+                "value": "",
+                "type": "path",
+                "description": "The guid for the updates you want to retrieve."
+              }
+            ],
+            "auth": {
+              "type": "oauth2",
+              "flow": "client_credentials",
+              "accessTokenUrl": "https://findmoney.fingoal.com/v3/authentication",
+              "credentials": {
+                "clientId": "{{clientId}}",
+                "clientSecret": "{{clientSecret}}"
+              }
+            }
+          },
+          "docs": "If you subscribe to the user tag status updates, you can retrieve them from this endpoint with the `guid` you received from the status update webhook. The tag updates will stay live at this endpoint for 24 hours. \n"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}
