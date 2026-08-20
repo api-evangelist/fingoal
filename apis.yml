@@ -33,6 +33,15 @@ specificationVersion: '0.23'
 created: '2026-07-17'
 modified: '2026-08-14'
 tags:
+- Financial-Services
+- Fintech
+- Transaction Enrichment
+- Data Enrichment
+- Personal Financial Management
+- Banking
+- Categorization
+- Webhook
+tags_raw:
 - Financial Services
 - Fintech
 - Transaction Enrichment
@@ -207,6 +216,11 @@ apis:
   humanURL: https://link-money-docs.fingoal.dev/
   baseURL: https://link-money-dev.fingoal.dev/api
   tags:
+  - Account Aggregation
+  - Account Verification
+  - Open Banking
+  - Webhook
+  tags_raw:
   - Account Aggregation
   - Account Verification
   - Open Banking
