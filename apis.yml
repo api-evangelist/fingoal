@@ -199,41 +199,144 @@ apis:
     url: errors/fingoal-problem-types.yml
   - type: DataModel
     url: data-model/fingoal-data-model.yml
-- aid: fingoal:fingoal-link-money-api
-  name: FinGoal Link Money API
-  description: >-
-    Link Money is an authentication portal in front of a shared account-aggregation
-    instance. A bank or credit union buys one aggregation environment (a "tenant"),
-    and Link Money authenticates its several fintech partners into that same silo
-    instead of each of them integrating an aggregator separately. Developers mint a
-    tenant-scoped JWT from clientId/clientSecret/tenantId, retrieve Yodlee FastLink 4
-    session details to open the account-linking widget in their own frontend, and
-    register HTTPS webhooks for aggregation events (DATA_UPDATES, REFRESH,
-    AUTO_REFRESH_UPDATES, LATEST_BALANCE_UPDATES, CDV_STATUS_UPDATES, OB_CONSENT,
-    OB_ACTIVE_CONSENT_REMINDER). Beyond the nine described operations the API is a
-    direct proxy to the Yodlee Core API, surfaced unaltered except that the user's
-    loginName moves into a request header. Only a development server is published.
-  humanURL: https://link-money-docs.fingoal.dev/
-  baseURL: https://link-money-dev.fingoal.dev/api
+- aid: fingoal:fingoal-client-management-api
+  name: FinGoal Client Management API
+  description: "There are three kinds of people who interact with Link Money: \n- **Users** are the people\
+    \ who use the Link Money application. They are the people who log in, view their accounts, and make\
+    \ transactions.\n- **Clients** are the people who use the Link Money API. They are the people who\
+    \ build applications that interact with the Link Money API.\n- **Tenants** are the organizations that\
+    \ use Link Money. They are the people who manage the users and clients who interact with Link Money.\
+    \ Generally speaking, the `user` is an end user of the `tenant`'s application, and the `client` is\
+    \ a developer who is building the `tenant`'s application. \n\nEvery developer must have a client configuration\
+    \ in order to access Link Money. This includes developers who are operating within a tenant environment\
+    \ that they themselves manage. \n\n## Webhooks \nLink Money supports all available Yodlee webhooks,\
+    \ which are documented in the [Yodlee API documentation](https://developer.envestnet.com/resources/yodlee/webhooks/docs).\
+    \ Developers can subscribe to webhooks by sending requests to the Link Money API webhook management\
+    \ endpoints. \n\nAs each Link Money tenant is a separate environment, each tenant requires its own\
+    \ webhook subscription. Make sure you authenticate with a token that has the proper tenant ID to ensure\
+    \ tha the webhook subscription is created in the correct tenant environment.\n\nLink Money tenants\
+    \ are shared by multiple clients, so it is possible to receive webhook notifications from customers\
+    \ who are not specifically accessing your application. Make sure that your application logic accounts\
+    \ for events that are related to users who other clients may have registered."
+  humanURL: https://docs.fingoal.dev/
+  baseURL: https://findmoney.fingoal.com/v3
   tags:
-  - Account Aggregation
-  - Account Verification
-  - Open Banking
-  - Webhook
-  tags_raw:
-  - Account Aggregation
-  - Account Verification
-  - Open Banking
-  - Webhooks
+  - Client Management
   properties:
   - type: OpenAPI
-    url: openapi/fingoal-link-money-api-openapi.yml
+    url: openapi/fingoal-client-management-api-openapi.yml
   - type: Documentation
     url: https://link-money-docs.fingoal.dev/
   - type: APIReference
     url: https://link-money-docs.fingoal.dev/
-  - type: Overlay
-    url: overlays/fingoal-link-money-overlay.yaml
+  - type: Webhooks
+    url: asyncapi/fingoal-link-money-webhooks.yml
+  - type: Components
+    url: components/fingoal-components.yml
+  - type: Authentication
+    url: authentication/fingoal-authentication.yml
+  - type: DataModel
+    url: data-model/fingoal-data-model.yml
+  - type: RateLimits
+    url: rate-limits/fingoal-rate-limits.yml
+  - type: SignUp
+    url: https://fingoal.com/request-developer-account
+- aid: fingoal:fingoal-fastlink-api
+  name: FinGoal Fastlink API
+  description: "The Link Money API permits end users to link and get data from their bank accounts. But\
+    \ of course, that requires a front-end interface. That's where the Fastlink comes in.\n\nThe Fastlink\
+    \ is an example of what we call a \"Linking Widget\" - a small application, usually embedded via iframe\
+    \ in another financial application, that allows end users to interact with an aggregation service\
+    \ - in this case, Yodlee's Fastlink. \n\nIn this documentation `Fastlink` refers specifically to `Fastlink\
+    \ 4`, which is the most recent version of Yodlee's Fastlink widget. We do not support older versions\
+    \ of Fastlink, and urge all of our onboarding customers to upgrade to Fastlink 4. \n\nTo open a frontend\
+    \ session with Link Money's Fastlink4, you must: \n- Have a client registered with the Link Money\
+    \ API\n- Have client credentials for the Link Money API \n- Have a single registered user with the\
+    \ Link Money API\n- Have a web application (or test web application) with HTML and JavaScript where\
+    \ the FL4 can be embedded.\n\n### Step 1: Get an authentication token\nFirst, get an authentication\
+    \ token for Link Money. \n```js\nconst fetch = require('node-fetch'); // If using Node.js, ensure\
+    \ to install the 'node-fetch' package\n\n// Client credentials and other required information. We\
+    \ recommend storing these in a secure location, such as a password vault.\nconst clientId = 'YOUR_CLIENT_ID';\n\
+    const clientSecret = 'YOUR_CLIENT_SECRET';\n\n// The URL to your authentication endpoint\nconst tokenUrl\
+    \ = '{LINK_MONEY_BASE_URL}/oauth/token';\n\n// Prepare the request body\nconst requestBody = { clientId,\
+    \ clientSecret };\n\n// Make the HTTP POST request to obtain the JWT\ntry {\n  const rawResponse =\
+    \ await fetch(tokenUrl, {\n    method: 'POST',\n    headers: {\n      'Content-Type': 'application/json'\n\
+    \    },\n    body: requestBody\n  });\n  const data = await response.json();\n  const token = data.accessToken;\n\
+    \    // Use the access token for subsequent API requests that require authentication\n} catch(error)\
+    \ {\n  console.error('Error fetching the access token:', error);\n}\n```\n### Step 2: Get the Fastlink\
+    \ configuration\nWith the `token` from the request, you can authorize a call to the Fastlink widget\
+    \ endpoint. \n```js \nconst fetch = require('node-fetch'); // If using Node.js, ensure to install\
+    \ the 'node-fetch' package\nconst accessToken = \"{YOUR_ACCESS_TOKEN}\"; // see previous step.\nconst\
+    \ getFastlinkConfigUrl = '{LINK_MONEY_BASE_URL}/yodlee/fastlink';\nconst login_name = `any_string_of_your_choice`;\n\
+    try {\n  const rawResponse = await fetch(getFastlinkConfigUrl, {\n    method: 'POST',\n    headers:\
+    \ {\n      'Content-Type': 'application/json',\n      'Authorization': `Bearer ${accessToken}`\n \
+    \   },\n\tbody: { login_name }\n  });\n  const data = await response.json();\n  const { fastlinkConfiguration\
+    \ } = data;\n  const { accessToken, fastLinkURL, configName } = fastlinkConfiguration;\n    // Use\
+    \ the accessToken, fastLinkURL, and configName to embed the Fastlink widget in your application\n\
+    } catch(error) {\n  console.error('Error fetching the access token:', error);\n}\n```\n### Step 3:\
+    \ Embed the Fastlink widget\nThe fields provided above have supplied you with everything you need\
+    \ to open the Yodlee Fastlink widget in your application. To complete the integration, you will need\
+    \ to use the Yodlee Fastlink SDK along with the configuration provided above.\n```html\n<!-- Mark\
+    \ Up -->\n<div id=\"container-fastlink\">\n\t<div style=\"text-align: center;\">\n   <input type=\"\
+    submit\" id=\"btn-fastlink\" value=\"Link an Account\">\n</div>\n</div>\n\n<!-- Yodlee FL4 CDN -->\n\
+    <script type='text/javascript' src='https://cdn.yodlee.com/fastlink/v4/initialize.js'></script>\n\n\
+    <!-- Yodlee FL4 Config -->\n<script> \n// embed the code provided in the previous step here to receive...\n\
+    const { accessToken, fastLinkURL, configName } = fastlinkConfiguration;\n(function (window) {\n  //Open\
+    \ FastLink\n  const fastlinkBtn = document.getElementById('btn-fastlink');\n  fastlinkBtn.addEventListener('click',\
+    \ function() {\n    window.fastlink.open({\n      fastLinkURL: fastLinkURL, // from step 2\n     \
+    \ accessToken: `Bearer ${accessToken}`, // from step 2; do not use the token from step 1 here. \n\
+    \      params: {\n        configName : configName // from step 2\n      },\n      onSuccess: function\
+    \ (data) {\n        // will be called on success. For list of possible message, refer to onSuccess(data)\
+    \ Method.\n        console.log(data);\n      },\n      onError: function (data) {\n        // will\
+    \ be called on error. For list of possible message, refer to onError(data) Method.\n        console.log(data);\n\
+    \      },\n      onClose: function (data) {\n        // will be called called to close FastLink. For\
+    \ list of possible message, refer to onClose(data) Method.\n        console.log(data);\n      },\n\
+    \      onEvent: function (data) {\n        // will be called on intermittent status update.\n    \
+    \    console.log(data);\n      }\n    },\n    'container-fastlink');\n  }, false);\n}(window));\n\
+    </script>\n```\n\n### Step 4: Additional Configuration\nThe Fastlink widget can be configured to meet\
+    \ your specific needs. For more information on configuration options, see the [Yodlee Fastlink 4 documentation](https://developer.envestnet.com/resources/yodlee/fastlink-4/docs/documentation).\
+    \ \n\nThe Link Money API surfaces the variables required to open any instance of Fastlink 4. However,\
+    \ we do not currently surface any helper functions for customized instances of Fastlink4. However,\
+    \ we also do not restrict you from customizing the Fastlink widget to meet your needs. If you are\
+    \ opening the FL4 for a specific provider, simply alter the base configuration above as you normally\
+    \ would."
+  humanURL: https://docs.fingoal.dev/
+  baseURL: https://findmoney.fingoal.com/v3
+  tags:
+  - Fastlink
+  properties:
+  - type: OpenAPI
+    url: openapi/fingoal-fastlink-api-openapi.yml
+  - type: Documentation
+    url: https://link-money-docs.fingoal.dev/
+  - type: APIReference
+    url: https://link-money-docs.fingoal.dev/
+  - type: Webhooks
+    url: asyncapi/fingoal-link-money-webhooks.yml
+  - type: Components
+    url: components/fingoal-components.yml
+  - type: Authentication
+    url: authentication/fingoal-authentication.yml
+  - type: DataModel
+    url: data-model/fingoal-data-model.yml
+  - type: RateLimits
+    url: rate-limits/fingoal-rate-limits.yml
+  - type: SignUp
+    url: https://fingoal.com/request-developer-account
+- aid: fingoal:fingoal-oauth-api
+  name: FinGoal OAUTH API
+  description: The Oauth API from FinGoal — 1 operation(s) for oauth.
+  humanURL: https://docs.fingoal.dev/
+  baseURL: https://findmoney.fingoal.com/v3
+  tags:
+  - Oauth
+  properties:
+  - type: OpenAPI
+    url: openapi/fingoal-oauth-api-openapi.yml
+  - type: Documentation
+    url: https://link-money-docs.fingoal.dev/
+  - type: APIReference
+    url: https://link-money-docs.fingoal.dev/
   - type: Webhooks
     url: asyncapi/fingoal-link-money-webhooks.yml
   - type: Components
@@ -252,6 +355,8 @@ maintainers:
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: Overlay
+  url: overlays/fingoal-link-money-overlay.yaml
 - type: Overlay
   url: overlays/fingoal-insights-overlay.yaml
 - type: DeveloperPortal
