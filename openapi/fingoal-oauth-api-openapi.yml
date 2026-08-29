@@ -1,0 +1,118 @@
+openapi: 3.2.0
+info:
+  title: Fingoal OAUTH API
+  version: 1.0.0
+  description: 'Operations tagged Oauth across 2 of this provider''s published API definitions: fingoal-link-money-api-openapi.yml, fingoal-link-money-openapi-original.json. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://link-money-dev.fingoal.dev
+  description: Development server
+security:
+- BearerAuth: []
+tags:
+- name: Oauth
+paths:
+  /oauth/token:
+    post:
+      summary: Obtain an access token
+      operationId: oauthToken
+      description: 'Obtain an access token using client credentials. The request must include `clientId`, `clientSecret`, and the custom claims `tenantId` and `userId` to specify the tenant and end user the token will represent.
+
+        `tenantId` is only required in cases where you are trying to access a tenant-specific resource. Some routes, like those that let you view and alter your client configuration, do not require a token with this claim. `userId` is only required in cases where you are trying to access a user-specific _and_ tenant-specific resource. Some routes, like those that let you generate new users, do not require a token with this claim, even if they do require a token with a tenant claim.
+
+        '
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                clientId:
+                  type: string
+                clientSecret:
+                  type: string
+                tenantId:
+                  type: string
+                  description: The ID of the tenant the developer wishes to access.
+                userId:
+                  type: string
+                  description: The ID of the end user the developer is acting on behalf of.
+              required:
+              - clientId
+              - clientSecret
+              - tenantId
+      responses:
+        '200':
+          description: A JSON object containing the access token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                  tokenType:
+                    type: string
+                  expiresIn:
+                    type: integer
+                  scope:
+                    type: string
+                    description: The scope(s) for which the token is valid, corresponding to the institution ID.
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+                    description: The error object.
+                    properties:
+                      code:
+                        type: integer
+                        description: The error code.
+                        example: 400
+                      details:
+                        type: array
+                        items:
+                          type: string
+                          description: Details about the error.
+                          example: Expected 'webhookUrl' to be a string, but received 'null' instead.
+                      documentation:
+                        type: string
+                        format: uri
+                        description: A link to the documentation for this error.
+                      received:
+                        type: object
+                        description: The JSON of the payload that we received from you.
+                      expected:
+                        type: object
+                        description: The expected formatting for the JSON the endpoint requires. This varies from endpoint to endpoint.
+                        example:
+                          field1: string
+                          field2: integer
+                          field3: boolean
+        '401':
+          description: "Unauthorized. The oauth token call can return Unauthorized for the following reasons: \n  - Your client ID is invalid. \n  - Your client secret is invalid. \n  - Your tenant ID is invalid. \n  - Your client is not authorized to access the specified tenant. \n\nThe `details` field in the response body will provide the specific reason why your authentication failed. \n"
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1client/get/responses/401/content/application~1json/schema'
+      tags:
+      - Oauth
+    servers:
+    - url: https://link-money-dev.fingoal.dev
+      description: Development server
+components:
+  securitySchemes:
+    BearerAuth:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://link-money-dev.fingoal.dev/api/oauth/token
+          scopes:
+            tenantId: Varies according to the tenant you are trying to access.
+x-refined-from:
+- fingoal-link-money-api-openapi.yml
+- fingoal-link-money-openapi-original.json

@@ -361,6 +361,32 @@ apis:
     url: rate-limits/fingoal-rate-limits.yml
   - type: SignUp
     url: https://fingoal.com/request-developer-account
+- aid: fingoal:fingoal-webhooks-api
+  name: FinGoal Webhooks API
+  description: >-
+    Webhook payload schemas for all webhook types. Configure which webhooks you receive using the Webhook
+    Configurations endpoints.
+
+
+    **Available Webhook Types:**
+
+    - `ENRICHMENT_DATA`: Data-rich Transaction Enrichment (full payload with enriched transactions)
+
+    - `ENRICHMENT_NOTIFICATION`: Notification-only Transaction Enrichment (batch_request_id for fetching
+    results)
+
+    - `USER_TAGS_DATA`: Data-rich User Tags (full payload with created/deleted/modified tags)
+
+    - `USER_TAGS_NOTIFICATION`: Notification-only User Tags (guid for fetching results)
+
+    - `INSIGHTS`: Financial insights and recommendations
+  humanURL: https://docs.fingoal.dev/
+  baseURL: https://findmoney.fingoal.com/v3
+  tags:
+  - Webhooks
+  properties:
+  - type: OpenAPI
+    url: openapi/fingoal-webhooks-api-openapi.yml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com

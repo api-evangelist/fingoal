@@ -1,0 +1,424 @@
+openapi: 3.2.0
+info:
+  title: Fingoal Client Management API
+  version: 1.0.0
+  description: 'Operations tagged Client Management across 2 of this provider''s published API definitions: fingoal-link-money-api-openapi.yml, fingoal-link-money-openapi-original.json. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://link-money-dev.fingoal.dev
+  description: Development server
+security:
+- BearerAuth: []
+tags:
+- name: Client Management
+  description: "There are three kinds of people who interact with Link Money: \n- **Users** are the people who use the Link Money application. They are the people who log in, view their accounts, and make transactions.\n- **Clients** are the people who use the Link Money API. They are the people who build applications that interact with the Link Money API.\n- **Tenants** are the organizations that use Link Money. They are the people who manage the users and clients who interact with Link Money. Generally speaking, the `user` is an end user of the `tenant`'s application, and the `client` is a developer who is building the `tenant`'s application. \n\nEvery developer must have a client configuration in order to access Link Money. This includes developers who are operating within a tenant environment that they themselves manage. \n\n## Webhooks \nLink Money supports all available Yodlee webhooks, which are documented in the [Yodlee API documentation](https://developer.envestnet.com/resources/yodlee/webhooks/docs). Developers can subscribe to webhooks by sending requests to the Link Money API webhook management endpoints. \n\nAs each Link Money tenant is a separate environment, each tenant requires its own webhook subscription. Make sure you authenticate with a token that has the proper tenant ID to ensure tha the webhook subscription is created in the correct tenant environment.\n\nLink Money tenants are shared by multiple clients, so it is possible to receive webhook notifications from customers who are not specifically accessing your application. Make sure that your application logic accounts for events that are related to users who other clients may have registered. "
+paths:
+  /client:
+    get:
+      tags:
+      - Client Management
+      summary: View your Client Configuration.
+      description: "This endpoint returns details about your client's current configuration. \n"
+      operationId: getClient
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          description: Client Configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Client'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+                    description: The error object.
+                    properties:
+                      code:
+                        type: integer
+                        description: The error code.
+                        example: 401
+                      message:
+                        type: string
+                        description: The error message.
+                        example: Unauthorized
+                      details:
+                        type: string
+                        description: Additional details about the error.
+                        example: The client endpoint requires a valid access token. Either none was provided, or the token provided was invalid. Please check your client credentials and try again.
+    servers:
+    - url: https://link-money-dev.fingoal.dev
+      description: Development server
+  /client/webhooks:
+    get:
+      tags:
+      - Client Management
+      summary: View a list of your currently-configured webhooks.
+      description: "This endpoint returns the full list of webhooks currently configured for your client. \n\nThe list has a default length of 10 items. For additional webhooks, use the `limit` and `offset` parameters to paginate the query. \n"
+      operationId: getWebhooks
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: limit
+        in: query
+        description: The maximum number of webhooks to return.
+        required: false
+        schema:
+          type: integer
+          example: 10
+      - name: offset
+        in: query
+        description: The number of webhooks to skip before returning results.
+        required: false
+        schema:
+          type: integer
+          example: 0
+      responses:
+        '200':
+          description: Webhook List
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  webhooks:
+                    type: array
+                    description: A list of webhooks.
+                    items:
+                      $ref: '#/components/schemas/Webhook'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1client/get/responses/401/content/application~1json/schema'
+    post:
+      summary: Enable a new webhook.
+      operationId: createWebhook
+      tags:
+      - Client Management
+      description: Allows clients to create a new webhook configuration by specifying the URI. The system generates all other fields.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                uri:
+                  type: string
+                  format: uri
+                  pattern: ^https:\/\/
+                  description: The HTTPS URI where the webhook will be sent. Must be a valid HTTPS URL.
+                webhookTypes:
+                  type: array
+                  description: The types of webhooks that you want sent to the specified URI.
+                  items:
+                    type: string
+                    enum:
+                    - DATA_UPDATES
+                    - REFRESH
+                    - AUTO_REFRESH_UPDATES
+                    - LATEST_BALANCE_UPDATES
+                    - CDV_STATUS_UPDATES
+                    - OB_CONSENT
+                    - OB_ACTIVE_CONSENT_REMINDER
+                    description: The type of webhook you want sent to this URI.
+                webhookDisabled:
+                  type: boolean
+                  description: A boolean indicating whether the webhook is disabled.
+      responses:
+        '201':
+          description: Webhook configuration created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  webhook:
+                    $ref: '#/components/schemas/Webhook'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1oauth~1token/post/responses/400/content/application~1json/schema'
+    servers:
+    - url: https://link-money-dev.fingoal.dev
+      description: Development server
+  /client/webhooks/{webhookId}:
+    get:
+      summary: Retrieve a specific webhook
+      tags:
+      - Client Management
+      operationId: getWebhook
+      description: Fetches the details of a specific webhook configuration using its unique identifier.
+      parameters:
+      - name: webhookId
+        in: path
+        required: true
+        description: The UUID of the webhook to retrieve.
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Webhook configuration retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Webhook'
+        '404':
+          description: Webhook with specified ID not found.
+    patch:
+      tags:
+      - Client Management
+      operationId: updateWebhook
+      summary: Update a webhook configuration
+      description: "Use the update webhook endpoint to change details of one of your webhook configurations. Using this endpoint, you can: \n  - Change the URI where the webhook sends data.\n  - Update the types of webhooks you receive.\n  - Temporarily disable the webhook.\n  - Re-enable a disabled webhook.\n"
+      parameters:
+      - name: webhookId
+        in: path
+        required: true
+        description: The unique identifier of the webhook to update.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                uri:
+                  type: string
+                  format: uri
+                  description: The new URI where the webhook will send data.
+                webhookTypes:
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                    - DATA_UPDATES
+                    - REFRESH
+                    - AUTO_REFRESH_UPDATES
+                    - LATEST_BALANCE_UPDATES
+                    - CDV_STATUS_UPDATES
+                    - OB_CONSENT
+                    - OB_ACTIVE_CONSENT_REMINDER
+                  description: The types of webhooks the developer wishes to receive.
+                webhookDisabled:
+                  type: boolean
+                  description: Flag to disable the webhook temporarily.
+      responses:
+        '200':
+          description: Webhook configuration updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Webhook'
+        '400':
+          description: Invalid input, e.g., invalid URI format or invalid enum value for webhookTypes.
+        '404':
+          description: Webhook with specified ID not found.
+    delete:
+      operationId: deleteWebhook
+      tags:
+      - Client Management
+      summary: Delete a webhook configuration
+      description: Deletes a specific webhook configuration and returns the deleted webhook's data.
+      parameters:
+      - name: webhookId
+        in: path
+        required: true
+        description: The unique identifier of the webhook to delete.
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Webhook configuration deleted successfully. Returns the original webhook data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Webhook'
+        '404':
+          description: Webhook with specified ID not found.
+    servers:
+    - url: https://link-money-dev.fingoal.dev
+      description: Development server
+  /client/webhooks/{webhookId}/fire_test_webhook:
+    post:
+      operationId: fireTestWebhook
+      summary: Trigger a test webhook
+      tags:
+      - Client Management
+      description: 'Allows developers to trigger a test webhook event. This sends a dummy payload to the configured URI of the webhook identified by {webhookId}. This helps in verifying the webhook setup.
+
+        '
+      parameters:
+      - name: webhookId
+        in: path
+        required: true
+        description: The unique identifier of the webhook to test.
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Webhook test initiated and response received.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  receivedResponse:
+                    type: boolean
+                    description: Whether a response was received from the webhook endpoint.
+                  responseCode:
+                    type: integer
+                    description: The HTTP response code received from the webhook endpoint. Null if no response was received.
+                  firedAt:
+                    type: string
+                    format: date-time
+                    description: The timestamp when the webhook payload was fired.
+                  receivedAt:
+                    type: string
+                    format: date-time
+                    description: The timestamp when the response from the webhook was received. Null if no response was received.
+                  processingDuration:
+                    type: number
+                    format: float
+                    description: The duration in seconds it took for the webhook to process the request. Calculated as the difference between receivedAt and firedAt. Null if no response was received.
+                required:
+                - receivedResponse
+                - firedAt
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1client/get/responses/401/content/application~1json/schema'
+        '404':
+          description: Webhook not found.
+    servers:
+    - url: https://link-money-dev.fingoal.dev
+      description: Development server
+components:
+  schemas:
+    Webhook:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: A UUID unique identifier for the webhook.
+        uri:
+          type: string
+          format: uri
+          description: The URI address where the webhook is meant to go.
+        webhookTypes:
+          type: array
+          description: An array of the webhook types that your URI is registered to receive.
+          items:
+            type: string
+            enum:
+            - DATA_UPDATES
+            - REFRESH
+            - AUTO_REFRESH_UPDATES
+            - LATEST_BALANCE_UPDATES
+            - CDV_STATUS_UPDATES
+            - OB_CONSENT
+            - OB_ACTIVE_CONSENT_REMINDER
+            description: The type of webhook you want sent to this URI.
+        webhookDisabled:
+          type: boolean
+          description: A boolean indicating whether the webhook is disabled.
+        status:
+          type:
+          - string
+          - 'null'
+          enum:
+          - HEALTHY
+          - UNHEALTHY
+          description: An enumerator indicating the health status of the webhook; can be null, 'HEALTHY', or 'UNHEALTHY'.
+        lastAttempt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: A timestamp of the last time a webhook was attempted. Can be null if no attempt has been made.
+        lastAttemptStatus:
+          type: integer
+          description: The HTTP response code received at the last attempt. Can be null if no attempt has been made.
+          example: 200
+        lastSuccess:
+          format: date-time
+          type:
+          - string
+          - 'null'
+          description: A timestamp of the last time a webhook was successfully sent (received a 2XX response). Can be null if no successful attempt has been made.
+      required:
+      - id
+      - uri
+      - webhookTypes
+    Client:
+      type: object
+      properties:
+        client:
+          type: object
+          description: The client configuration.
+          properties:
+            clientId:
+              type: string
+              description: Your client ID.
+              example: CLI-12345678-1234-1234-1234-123456789012
+              format: uuid
+            clientName:
+              type: string
+              description: Your registered client name.
+              example: Hairfoot Budgeting
+            clientDescription:
+              type: string
+              description: Your registered client description.
+              example: A budgeting tool for a hardy folk.
+            registrationDate:
+              type: string
+              description: The date your client was registered.
+              example: '2021-01-01T00:00:00Z'
+              format: date-time
+            webhookIds:
+              type: array
+              description: A list of webhook IDs associated with your client.
+              items:
+                type: string
+                description: A webhook ID.
+                format: uuid[]
+                example:
+                - WBK-12345678-1234-1234-1234-123456789012
+            tenants:
+              type: array
+              description: A list of tenant IDs that your client is allowed to access.
+              items:
+                type: string
+                description: A tenant ID.
+                format: uuid[]
+                example:
+                - TNT-12345678-1234-1234-1234-123456789012
+  securitySchemes:
+    BearerAuth:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://link-money-dev.fingoal.dev/api/oauth/token
+          scopes:
+            tenantId: Varies according to the tenant you are trying to access.
+x-refined-from:
+- fingoal-link-money-api-openapi.yml
+- fingoal-link-money-openapi-original.json

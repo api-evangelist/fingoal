@@ -1,20 +1,43 @@
 {
   "provider": "fingoal",
   "sources": [
-    "fingoal-enrichment-api-openapi.yml",
-    "fingoal-user-tagging-api-openapi.yml",
-    "fingoal-webhook-configurations-api-openapi.yml"
+    "_original/fingoal-insights-openapi-original.json",
+    "_original/fingoal-link-money-api-openapi.yml",
+    "_original/fingoal-link-money-openapi-original.json"
   ],
   "outputs": [
     "fingoal-enrichment-api-openapi.yml",
     "fingoal-user-tagging-api-openapi.yml",
-    "fingoal-webhook-configurations-api-openapi.yml"
+    "fingoal-webhook-configurations-api-openapi.yml",
+    "fingoal-webhooks-api-openapi.yml",
+    "fingoal-client-management-api-openapi.yml",
+    "fingoal-fastlink-api-openapi.yml",
+    "fingoal-oauth-api-openapi.yml"
   ],
   "archived": [],
   "errors": [
-    "fingoal-user-tagging-api-openapi.yml: dangling $ref: #/components/schemas/UsersUserIdGet200Response"
+    "fingoal-insights-openapi-original.json: dangling $ref: #/components/schemas/UsersUserIdGet200Response"
   ],
   "warnings": [],
-  "notes": [],
-  "skipped": []
+  "notes": [
+    "sourced from openapi/_original/ (3 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "fingoal-insights-openapi-original.json: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "fingoal-link-money-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "fingoal-link-money-api-openapi.yml: tagged paths POST /oauth/token -> Oauth",
+    "fingoal-link-money-api-openapi.yml: declared missing tag: Oauth",
+    "fingoal-link-money-openapi-original.json: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "fingoal-link-money-openapi-original.json: tagged paths POST /oauth/token -> Oauth",
+    "fingoal-link-money-openapi-original.json: declared missing tag: Oauth",
+    "tag 'Client Management' spans 2 source specs (fingoal-link-money-api-openapi.yml, fingoal-link-money-openapi-original.json): per-path servers applied",
+    "tag 'Fastlink' spans 2 source specs (fingoal-link-money-api-openapi.yml, fingoal-link-money-openapi-original.json): per-path servers applied",
+    "tag 'Oauth' spans 2 source specs (fingoal-link-money-api-openapi.yml, fingoal-link-money-openapi-original.json): per-path servers applied"
+  ],
+  "skipped": [
+    "fingoal-client-management-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "fingoal-enrichment-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "fingoal-fastlink-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "fingoal-oauth-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "fingoal-user-tagging-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "fingoal-webhook-configurations-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
 }
