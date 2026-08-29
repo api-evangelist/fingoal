@@ -11,6 +11,18 @@ description: >-
   aggregation and verification across 17,000+ financial institutions.
   Authentication uses a JWT minted from client_id/client_secret; developer
   credentials are issued on request. FinGoal is SOC 2 Type II and GDPR compliant.
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: true
+  label: Hosted service · you call their endpoint
+  confidence: high
+  source:
+  - openapi
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 accessModel:
   pricing: unknown
   onboarding: self-serve
