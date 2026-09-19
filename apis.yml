@@ -373,6 +373,8 @@ apis:
   humanURL: https://docs.fingoal.dev/
   baseURL: https://findmoney.fingoal.com/v3
   tags:
+  - Authentication
+  tags_raw:
   - Oauth
   properties:
   - type: OpenAPI
