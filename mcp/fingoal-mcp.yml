@@ -1,16 +1,12 @@
 generated: '2026-08-14'
 method: derived
 status: candidate
-source: >-
-  openapi/_original/fingoal-insights-openapi-original.json,
-  openapi/_original/fingoal-link-money-openapi-original.json
-note: >-
-  No official hosted or local FinGoal MCP server exists. Re-checked 2026-08-14:
-  npm search for "fingoal" returns 0 packages, the github.com/fingoal
-  organisation ships no server, and neither docs host nor the MCP registries
-  reference one. The tools below are CANDIDATE mappings derived one-per-operation
-  from FinGoal's own published OpenAPIs, to seed a future server. Nothing here is
-  callable today - no endpoint is asserted.
+source: openapi/_original/fingoal-insights-openapi-original.json, openapi/_original/fingoal-link-money-openapi-original.json
+note: 'No official hosted or local FinGoal MCP server exists. Re-checked 2026-08-14: npm search for "fingoal"
+  returns 0 packages, the github.com/fingoal organisation ships no server, and neither docs host nor the
+  MCP registries reference one. The tools below are CANDIDATE mappings derived one-per-operation from
+  FinGoal''s own published OpenAPIs, to seed a future server. Nothing here is callable today - no endpoint
+  is asserted.'
 server:
   name: fingoal-insights
   transport: http
@@ -80,13 +76,7 @@ tools:
   source_operation: openapi/_original/fingoal-link-money-openapi-original.json#getFastlinkFourDetails
 deployment:
   mode: none
-  endpoint: null
-  install: null
-  package: null
-  auth: unknown
-  verified: searched
-  tools: 21
-  checked: '2026-08-14'
-  source: >-
-    npm registry search (0 results), github.com/fingoal repo list, MCP registry
-    and web search - no hosted endpoint and no stdio package published by FinGoal.
+  verified: derived
+  tools: 12
+  checked: '2026-08-12'
+  source: catalog MCP census
