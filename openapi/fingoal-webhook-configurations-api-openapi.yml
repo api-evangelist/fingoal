@@ -362,27 +362,6 @@ paths:
                       description: Savings estimation period (e.g., "monthly").
 components:
   schemas:
-    WebhookConfigurationsPutRequest:
-      type: string
-      enum:
-      - ENRICHMENT_DATA
-      - ENRICHMENT_NOTIFICATION
-      - USER_TAGS_DATA
-      - USER_TAGS_NOTIFICATION
-      - INSIGHTS
-      description: 'The type of webhook to configure:
-
-        - `ENRICHMENT_DATA`: Data-rich Transaction Enrichment webhooks (full payload)
-
-        - `ENRICHMENT_NOTIFICATION`: Non-data-rich Enrichment webhooks (notification only, fetch data from the `/cleanup/{batch_request_id}` endpoint)
-
-        - `USER_TAGS_DATA`: Data-rich User Tags webhooks (full payload)
-
-        - `USER_TAGS_NOTIFICATION`: Non-data-rich User Tags webhooks (notification only)
-
-        - `INSIGHTS`: Finsights/insights webhooks
-
-        '
     WebhookConfigurationsTestPostUSER_TAGS_DATA:
       type: object
       properties:
@@ -714,6 +693,27 @@ components:
               accountType:
                 description: The type of account associated with the transaction as received.
                 type: string
+    WebhookConfigurationsPutRequest:
+      type: string
+      enum:
+      - ENRICHMENT_DATA
+      - ENRICHMENT_NOTIFICATION
+      - USER_TAGS_DATA
+      - USER_TAGS_NOTIFICATION
+      - INSIGHTS
+      description: 'The type of webhook to configure:
+
+        - `ENRICHMENT_DATA`: Data-rich Transaction Enrichment webhooks (full payload)
+
+        - `ENRICHMENT_NOTIFICATION`: Non-data-rich Enrichment webhooks (notification only, fetch data from the `/cleanup/{batch_request_id}` endpoint)
+
+        - `USER_TAGS_DATA`: Data-rich User Tags webhooks (full payload)
+
+        - `USER_TAGS_NOTIFICATION`: Non-data-rich User Tags webhooks (notification only)
+
+        - `INSIGHTS`: Finsights/insights webhooks
+
+        '
     WebhookConfigurationsPut200Response:
       type: object
       properties:

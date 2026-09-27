@@ -1,6 +1,6 @@
 openapi: 3.2.0
 info:
-  title: Link Money OAUTH API
+  title: Link Money OAuth API
   description: The Link Money API is an authentication portal that allows multiple developers to access the same financial data from an aggregation API.
   version: 1.0.0
 servers:
