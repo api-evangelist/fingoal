@@ -498,24 +498,90 @@ paths:
           description: No transactions found for the given request id.
 components:
   schemas:
-    CleanupPost200Response:
+    CleanupPostRequest:
       type: object
+      required:
+      - transactions
       properties:
-        transactions_received:
-          type: boolean
-          description: Denotes whether FinSight API has successfully received the transactions.
-        transactions_validated:
-          type: boolean
-          description: Denotes whether or not the transaction payload successfully passed FinSight API validation.
-        processing:
-          type: boolean
-          description: Denotes whether the asynchronous enrichment process has commenced.
-        num_transactions_processing:
-          type: integer
-          description: The number of transactions that have been received.
-        batch_request_id:
-          type: string
-          description: A unique ID associated with the request for debugging.
+        transactions:
+          type: array
+          items:
+            type: object
+            required:
+            - accountType
+            - amountnum
+            - date
+            - original_description
+            - transactionid
+            - settlement
+            - uid
+            properties:
+              accountType:
+                type: string
+                description: 'The type of account associated with the transaction.
+
+
+                  For transactions from loan accounts, use ''savings''.
+
+                  '
+                enum:
+                - checking
+                - savings
+                - creditCard
+                example: checking
+              amountnum:
+                type: number
+                maxLength: 11
+                description: The transaction amount in USD. Negative amounts are automatically converted to positive amounts. Use the 'settlement' field to indicate whether the transaction was a 'debit' or 'credit'. The string representation of amount must be fewer than 11 characters.
+                example: 19.99
+              date:
+                description: The date of the transaction. Must be in the format 'YYYY-MM-DD'.
+                type: string
+                format: date
+                example: '2024-05-01'
+              identifiers:
+                description: A JSON representation of alternative user IDs. This field is designed exclusively for users with Banno, Salesforce, or other CRM integrations. Valid identifiers are currently limited to [`sfmc_contact_id`, `banno_end_user_id`].
+                type: object
+                properties:
+                  sfmc_contact_id:
+                    type: string
+                    example: sfmc-1234
+                  banno_end_user_id:
+                    type: string
+                    example: banno-1234
+              original_description:
+                description: 'The transaction''s description. Must be between 3 and 198 characters. Descriptions longer than 198 characters are automatically truncated.
+
+
+                  For transactions from loan accounts, prepend `LOANTRANS-` to this field.
+
+                  '
+                minLength: 1
+                maxLength: 198
+                type: string
+                example: Cottonwood Supermarket & Deli
+              transactionid:
+                description: A unique identifier for the transaction. Do not use PII or other information-rich data in this field. We strongly recommend using UUID or a similar identification system.
+                maxLength: 100
+                type: string
+                example: 178b1f61-dafe-4d47-837b-54ce34dc82b2
+              settlement:
+                description: Indicates whether the transaction was a 'debit' or 'credit' to the account.
+                type: string
+                enum:
+                - debit
+                - credit
+                example: debit
+              uid:
+                description: The ID of the user associated with the transaction. User IDs must be unique. Do not use PII or other information-rich data in this field. We strongly recommend using UUID or a similar identification system.
+                maxLength: 50
+                type: string
+                example: user123
+              accountid:
+                description: The account ID associated with the transaction. This field is optional and will not affect enrichment results. Do not use the actual account number. We strongly recommend using UUID or a similar identification system.
+                maxLength: 50
+                type: string
+                example: account456
     WebhookConfigurationsTestPostENRICHMENT_DATA:
       type: object
       properties:
@@ -772,90 +838,24 @@ components:
               accountType:
                 description: The type of account associated with the transaction as received.
                 type: string
-    CleanupPostRequest:
+    CleanupPost200Response:
       type: object
-      required:
-      - transactions
       properties:
-        transactions:
-          type: array
-          items:
-            type: object
-            required:
-            - accountType
-            - amountnum
-            - date
-            - original_description
-            - transactionid
-            - settlement
-            - uid
-            properties:
-              accountType:
-                type: string
-                description: 'The type of account associated with the transaction.
-
-
-                  For transactions from loan accounts, use ''savings''.
-
-                  '
-                enum:
-                - checking
-                - savings
-                - creditCard
-                example: checking
-              amountnum:
-                type: number
-                maxLength: 11
-                description: The transaction amount in USD. Negative amounts are automatically converted to positive amounts. Use the 'settlement' field to indicate whether the transaction was a 'debit' or 'credit'. The string representation of amount must be fewer than 11 characters.
-                example: 19.99
-              date:
-                description: The date of the transaction. Must be in the format 'YYYY-MM-DD'.
-                type: string
-                format: date
-                example: '2024-05-01'
-              identifiers:
-                description: A JSON representation of alternative user IDs. This field is designed exclusively for users with Banno, Salesforce, or other CRM integrations. Valid identifiers are currently limited to [`sfmc_contact_id`, `banno_end_user_id`].
-                type: object
-                properties:
-                  sfmc_contact_id:
-                    type: string
-                    example: sfmc-1234
-                  banno_end_user_id:
-                    type: string
-                    example: banno-1234
-              original_description:
-                description: 'The transaction''s description. Must be between 3 and 198 characters. Descriptions longer than 198 characters are automatically truncated.
-
-
-                  For transactions from loan accounts, prepend `LOANTRANS-` to this field.
-
-                  '
-                minLength: 1
-                maxLength: 198
-                type: string
-                example: Cottonwood Supermarket & Deli
-              transactionid:
-                description: A unique identifier for the transaction. Do not use PII or other information-rich data in this field. We strongly recommend using UUID or a similar identification system.
-                maxLength: 100
-                type: string
-                example: 178b1f61-dafe-4d47-837b-54ce34dc82b2
-              settlement:
-                description: Indicates whether the transaction was a 'debit' or 'credit' to the account.
-                type: string
-                enum:
-                - debit
-                - credit
-                example: debit
-              uid:
-                description: The ID of the user associated with the transaction. User IDs must be unique. Do not use PII or other information-rich data in this field. We strongly recommend using UUID or a similar identification system.
-                maxLength: 50
-                type: string
-                example: user123
-              accountid:
-                description: The account ID associated with the transaction. This field is optional and will not affect enrichment results. Do not use the actual account number. We strongly recommend using UUID or a similar identification system.
-                maxLength: 50
-                type: string
-                example: account456
+        transactions_received:
+          type: boolean
+          description: Denotes whether FinSight API has successfully received the transactions.
+        transactions_validated:
+          type: boolean
+          description: Denotes whether or not the transaction payload successfully passed FinSight API validation.
+        processing:
+          type: boolean
+          description: Denotes whether the asynchronous enrichment process has commenced.
+        num_transactions_processing:
+          type: integer
+          description: The number of transactions that have been received.
+        batch_request_id:
+          type: string
+          description: A unique ID associated with the request for debugging.
     EnrichmentNotificationPostRequest:
       type: object
       properties:
