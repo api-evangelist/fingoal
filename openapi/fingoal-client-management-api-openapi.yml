@@ -311,49 +311,6 @@ paths:
           description: Webhook not found.
 components:
   schemas:
-    Client:
-      type: object
-      properties:
-        client:
-          type: object
-          description: The client configuration.
-          properties:
-            clientId:
-              type: string
-              description: Your client ID.
-              example: CLI-12345678-1234-1234-1234-123456789012
-              format: uuid
-            clientName:
-              type: string
-              description: Your registered client name.
-              example: Hairfoot Budgeting
-            clientDescription:
-              type: string
-              description: Your registered client description.
-              example: A budgeting tool for a hardy folk.
-            registrationDate:
-              type: string
-              description: The date your client was registered.
-              example: '2021-01-01T00:00:00Z'
-              format: date-time
-            webhookIds:
-              type: array
-              description: A list of webhook IDs associated with your client.
-              items:
-                type: string
-                description: A webhook ID.
-                format: uuid[]
-                example:
-                - WBK-12345678-1234-1234-1234-123456789012
-            tenants:
-              type: array
-              description: A list of tenant IDs that your client is allowed to access.
-              items:
-                type: string
-                description: A tenant ID.
-                format: uuid[]
-                example:
-                - TNT-12345678-1234-1234-1234-123456789012
     Webhook:
       type: object
       properties:
@@ -410,6 +367,49 @@ components:
       - id
       - uri
       - webhookTypes
+    Client:
+      type: object
+      properties:
+        client:
+          type: object
+          description: The client configuration.
+          properties:
+            clientId:
+              type: string
+              description: Your client ID.
+              example: CLI-12345678-1234-1234-1234-123456789012
+              format: uuid
+            clientName:
+              type: string
+              description: Your registered client name.
+              example: Hairfoot Budgeting
+            clientDescription:
+              type: string
+              description: Your registered client description.
+              example: A budgeting tool for a hardy folk.
+            registrationDate:
+              type: string
+              description: The date your client was registered.
+              example: '2021-01-01T00:00:00Z'
+              format: date-time
+            webhookIds:
+              type: array
+              description: A list of webhook IDs associated with your client.
+              items:
+                type: string
+                description: A webhook ID.
+                format: uuid[]
+                example:
+                - WBK-12345678-1234-1234-1234-123456789012
+            tenants:
+              type: array
+              description: A list of tenant IDs that your client is allowed to access.
+              items:
+                type: string
+                description: A tenant ID.
+                format: uuid[]
+                example:
+                - TNT-12345678-1234-1234-1234-123456789012
   securitySchemes:
     BearerAuth:
       type: oauth2

@@ -437,61 +437,6 @@ components:
                     description: The amount by which this tag's score has changed. Can be negative or positive. Will be the difference between the new_value and previous_value fields.
                     type: integer
                     example: 25
-    WebhookConfigurationsPut200Response:
-      type: object
-      properties:
-        id:
-          type: integer
-          description: The unique identifier for this webhook configuration.
-          example: 1
-        client_id:
-          type: string
-          description: Your client identifier.
-          example: your-client-id
-        tenant_id:
-          type:
-          - string
-          - 'null'
-          description: The tenant public ID for tenant-specific configurations. Null for default configurations.
-          example: TEN-123456
-        webhook_type:
-          $ref: '#/components/schemas/WebhookConfigurationsPutRequest'
-        callback_url:
-          type: string
-          format: uri
-          description: The HTTPS URL where webhooks will be delivered.
-          example: https://your-server.com/webhooks/enrichment
-        created_at:
-          type: string
-          format: date-time
-          description: The timestamp when this configuration was created.
-          example: '2024-01-15T10:00:00.000Z'
-        updated_at:
-          type: string
-          format: date-time
-          description: The timestamp when this configuration was last updated.
-          example: '2024-01-15T10:00:00.000Z'
-    WebhookConfigurationsPutRequest:
-      type: string
-      enum:
-      - ENRICHMENT_DATA
-      - ENRICHMENT_NOTIFICATION
-      - USER_TAGS_DATA
-      - USER_TAGS_NOTIFICATION
-      - INSIGHTS
-      description: 'The type of webhook to configure:
-
-        - `ENRICHMENT_DATA`: Data-rich Transaction Enrichment webhooks (full payload)
-
-        - `ENRICHMENT_NOTIFICATION`: Non-data-rich Enrichment webhooks (notification only, fetch data from the `/cleanup/{batch_request_id}` endpoint)
-
-        - `USER_TAGS_DATA`: Data-rich User Tags webhooks (full payload)
-
-        - `USER_TAGS_NOTIFICATION`: Non-data-rich User Tags webhooks (notification only)
-
-        - `INSIGHTS`: Finsights/insights webhooks
-
-        '
     WebhookConfigurationsTestPostENRICHMENT_DATA:
       type: object
       properties:
@@ -748,6 +693,61 @@ components:
               accountType:
                 description: The type of account associated with the transaction as received.
                 type: string
+    WebhookConfigurationsPutRequest:
+      type: string
+      enum:
+      - ENRICHMENT_DATA
+      - ENRICHMENT_NOTIFICATION
+      - USER_TAGS_DATA
+      - USER_TAGS_NOTIFICATION
+      - INSIGHTS
+      description: 'The type of webhook to configure:
+
+        - `ENRICHMENT_DATA`: Data-rich Transaction Enrichment webhooks (full payload)
+
+        - `ENRICHMENT_NOTIFICATION`: Non-data-rich Enrichment webhooks (notification only, fetch data from the `/cleanup/{batch_request_id}` endpoint)
+
+        - `USER_TAGS_DATA`: Data-rich User Tags webhooks (full payload)
+
+        - `USER_TAGS_NOTIFICATION`: Non-data-rich User Tags webhooks (notification only)
+
+        - `INSIGHTS`: Finsights/insights webhooks
+
+        '
+    WebhookConfigurationsPut200Response:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The unique identifier for this webhook configuration.
+          example: 1
+        client_id:
+          type: string
+          description: Your client identifier.
+          example: your-client-id
+        tenant_id:
+          type:
+          - string
+          - 'null'
+          description: The tenant public ID for tenant-specific configurations. Null for default configurations.
+          example: TEN-123456
+        webhook_type:
+          $ref: '#/components/schemas/WebhookConfigurationsPutRequest'
+        callback_url:
+          type: string
+          format: uri
+          description: The HTTPS URL where webhooks will be delivered.
+          example: https://your-server.com/webhooks/enrichment
+        created_at:
+          type: string
+          format: date-time
+          description: The timestamp when this configuration was created.
+          example: '2024-01-15T10:00:00.000Z'
+        updated_at:
+          type: string
+          format: date-time
+          description: The timestamp when this configuration was last updated.
+          example: '2024-01-15T10:00:00.000Z'
   securitySchemes:
     Authentication:
       type: oauth2
