@@ -1,0 +1,16 @@
+generated: '2026-10-12'
+method: none
+source:
+- https://zapier.com/apps/fingoal/integrations
+- https://n8n.io/integrations/fingoal/
+- https://composio.dev/toolkits/fingoal
+- https://monid.ai/tools/fingoal
+checked:
+- https://composio.dev/toolkits/fingoal
+- https://monid.ai/tools/fingoal
+- https://n8n.io/integrations/fingoal/
+- https://zapier.com/apps/fingoal/integrations
+summary: null
+marketplace_apps: []
+edges: []
+templates: []
