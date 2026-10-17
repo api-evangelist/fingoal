@@ -151,81 +151,6 @@ webhooks:
           description: Success
 components:
   schemas:
-    WebhookConfigurationsTestPostUSER_TAGS_DATA:
-      type: object
-      properties:
-        tenant_id:
-          type: string
-          description: The ID of the tenant for the users included in this update, if they are from a tenant environment.
-        userTags:
-          type: object
-          properties:
-            created:
-              description: A list of the new user tags that were generated for this user since the last user tagging update. A full list of the user tags can be accessed [here](https://fingoal.com/tags-list).
-              type: array
-              items:
-                type: object
-                properties:
-                  user_id:
-                    description: The user who received this tag. Corresponds to whatever 'uid' you initially uploaded to the enrichment.
-                    type: string
-                    example: '409088'
-                  user_tag_id:
-                    description: The ID of the tag that has been applied.
-                    type: integer
-                    example: 61
-                  tag_name:
-                    description: The name of the tag that has been applied.
-                    type: string
-                    example: Home Improvement Loan
-            deleted:
-              description: A list of the user tags that were removed from this user since the last user tagging update.
-              type: array
-              items:
-                type: object
-                properties:
-                  user_id:
-                    description: The user who received this tag. Corresponds to whatever 'uid' you initially uploaded to the enrichment.
-                    type: string
-                    example: '409088'
-                  user_tag_id:
-                    description: The ID of the tag that has been removed.
-                    type: integer
-                    example: 46
-                  tag_name:
-                    description: The name of the tag that has been removed.
-                    type: string
-                    example: Movie Goer
-            modified:
-              description: For incremental (that is, scored) user tags. Contains all scoring changes for any incremental user tags that have received a score change since the last update.
-              type: array
-              items:
-                type: object
-                properties:
-                  user_id:
-                    description: The user who received this tag. Corresponds to whatever 'uid' you initially uploaded to the enrichment.
-                    type: string
-                    example: '409088'
-                  user_tag_id:
-                    description: The ID of the tag that has been updated.
-                    type: integer
-                    example: 46
-                  tag_name:
-                    description: The name of the tag that has been updated.
-                    type: string
-                    example: Movie Goer
-                  previous_value:
-                    description: The last value for this tag's score, prior to this update.
-                    type: integer
-                    example: 50
-                  new_value:
-                    description: The new value for this tag's score.
-                    type: integer
-                    example: 75
-                  delta:
-                    description: The amount by which this tag's score has changed. Can be negative or positive. Will be the difference between the new_value and previous_value fields.
-                    type: integer
-                    example: 25
     WebhookConfigurationsTestPostENRICHMENT_DATA:
       type: object
       properties:
@@ -502,6 +427,81 @@ components:
           - 'null'
           description: The ID of the tenant that this webhook is associated with, if the webhook is from a tenant environment.
           example: TNT-5f4b1b9b-4b7d-4b7d-4b7d-4b7d4b7d4b7d
+    WebhookConfigurationsTestPostUSER_TAGS_DATA:
+      type: object
+      properties:
+        tenant_id:
+          type: string
+          description: The ID of the tenant for the users included in this update, if they are from a tenant environment.
+        userTags:
+          type: object
+          properties:
+            created:
+              description: A list of the new user tags that were generated for this user since the last user tagging update. A full list of the user tags can be accessed [here](https://fingoal.com/tags-list).
+              type: array
+              items:
+                type: object
+                properties:
+                  user_id:
+                    description: The user who received this tag. Corresponds to whatever 'uid' you initially uploaded to the enrichment.
+                    type: string
+                    example: '409088'
+                  user_tag_id:
+                    description: The ID of the tag that has been applied.
+                    type: integer
+                    example: 61
+                  tag_name:
+                    description: The name of the tag that has been applied.
+                    type: string
+                    example: Home Improvement Loan
+            deleted:
+              description: A list of the user tags that were removed from this user since the last user tagging update.
+              type: array
+              items:
+                type: object
+                properties:
+                  user_id:
+                    description: The user who received this tag. Corresponds to whatever 'uid' you initially uploaded to the enrichment.
+                    type: string
+                    example: '409088'
+                  user_tag_id:
+                    description: The ID of the tag that has been removed.
+                    type: integer
+                    example: 46
+                  tag_name:
+                    description: The name of the tag that has been removed.
+                    type: string
+                    example: Movie Goer
+            modified:
+              description: For incremental (that is, scored) user tags. Contains all scoring changes for any incremental user tags that have received a score change since the last update.
+              type: array
+              items:
+                type: object
+                properties:
+                  user_id:
+                    description: The user who received this tag. Corresponds to whatever 'uid' you initially uploaded to the enrichment.
+                    type: string
+                    example: '409088'
+                  user_tag_id:
+                    description: The ID of the tag that has been updated.
+                    type: integer
+                    example: 46
+                  tag_name:
+                    description: The name of the tag that has been updated.
+                    type: string
+                    example: Movie Goer
+                  previous_value:
+                    description: The last value for this tag's score, prior to this update.
+                    type: integer
+                    example: 50
+                  new_value:
+                    description: The new value for this tag's score.
+                    type: integer
+                    example: 75
+                  delta:
+                    description: The amount by which this tag's score has changed. Can be negative or positive. Will be the difference between the new_value and previous_value fields.
+                    type: integer
+                    example: 25
   securitySchemes:
     Authentication:
       type: oauth2
