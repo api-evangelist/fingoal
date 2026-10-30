@@ -64,6 +64,149 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-FinGoal is a company surfaced as a portfolio company of techstars and added to the API Evangelist network as a stub for enrichment. This profile is a lead awaiting the enrichment pipeline.
+FinGoal provides financial data insights for banks, credit unions, and fintechs. Its Insights API enriches raw bank and card transaction data with clean merchant names, categorization, and behavioral "Persona Tags" that power personalized recommendations, targeted offers, and better banking features. The API is batch-oriented: developers submit transactions, receive a batch_request_id, and collect enriched results by polling or via ENRICHMENT_DATA and USER_TAGS_DATA webhooks. FinGoal also offers Link Money for account aggregation and verification across 17,000+ financial institutions. Authentication uses a JWT minted from client_id/client_secret; developer credentials are issued on request. FinGoal is SOC 2 Type II and GDPR compliant.
 
-Backed by: techstars — https://fingoal.com/
+**Areas:** Financial Services · Fintech · Transaction Enrichment · Data Enrichment · Personal Financial Management · Banking · Categorization · Webhook
+
+## FinGoal on APIs.io
+
+Everything profiled for FinGoal is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/fingoal/](https://apis.io/providers/fingoal/)** — or go straight to one of the APIs or properties below.
+
+### APIs (7)
+
+- [FinGoal Enrichment API](https://apis.io/apis/fingoal/fingoal-enrichment-api/) — The Insights API's transaction enrichment endpoints enable developers to clean and enhance their transaction data. This process includes standardizing…
+- [FinGoal User Tagging API](https://apis.io/apis/fingoal/fingoal-user-tagging-api/) — markdown/tagging.md
+- [FinGoal Webhook Configurations API](https://apis.io/apis/fingoal/fingoal-webhook-configurations-api/) — Manage webhook callback URLs for your client. Supports default and tenant-specific configurations per webhook type.
+- [FinGoal Client Management API](https://apis.io/apis/fingoal/fingoal-client-management-api/) — There are three kinds of people who interact with Link Money: - **Users** are the people who use the Link Money application. They are the people who log in,…
+- [FinGoal Fastlink API](https://apis.io/apis/fingoal/fingoal-fastlink-api/) — The Link Money API permits end users to link and get data from their bank accounts. But of course, that requires a front-end interface. That's where the…
+- [FinGoal Webhooks API](https://apis.io/apis/fingoal/fingoal-webhooks-api/) — Webhook payload schemas for all webhook types. Configure which webhooks you receive using the Webhook Configurations endpoints. **Available Webhook Types:**…
+- [FinGoal OAUTH API](https://apis.io/apis/fingoal/fingoal-oauth-api/) — The Oauth API from FinGoal — 1 operation(s) for oauth.
+
+### Published properties
+
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
+
+#### AsyncAPI (2)
+
+Event-driven and webhook contracts.
+
+- [Fingoal Link Money Webhooks](https://apis.io/asyncapis/fingoal/fingoal-link-money-webhooks/)
+- [Fingoal Webhooks](https://apis.io/asyncapis/fingoal/fingoal-webhooks/)
+
+#### MCP servers (1)
+
+Model Context Protocol servers that expose the API to agents.
+
+- [fingoal-insights](https://apis.io/servers/fingoal/fingoal-insights/)
+
+#### Collections (3)
+
+Postman and Open Collection request collections.
+
+- [Insights Enrichment API](https://apis.io/collections/fingoal/open-fingoal-enrichment-api/)
+- [Insights Enrichment User Tagging API](https://apis.io/collections/fingoal/open-fingoal-user-tagging-api/)
+- [Insights Enrichment Webhook Configurations API](https://apis.io/collections/fingoal/open-fingoal-webhook-configurations-api/)
+
+#### Overlays (2)
+
+OpenAPI overlays, including conversational phrasing for each operation.
+
+- [Fingoal Insights Overlay](https://apis.io/overlays/fingoal/fingoal-insights-overlay/)
+- [Fingoal Link Money Overlay](https://apis.io/overlays/fingoal/fingoal-link-money-overlay/)
+
+#### Security (3)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Fingoal Authentication](https://apis.io/security/fingoal/fingoal-authentication/)
+- [Fingoal Domain Security](https://apis.io/security/fingoal/fingoal-domain-security/)
+- [Fingoal Trust Center](https://apis.io/security/fingoal/fingoal-trust-center/)
+
+#### OAuth scopes (1)
+
+The permissions the API asks for.
+
+- [Fingoal Scopes](https://apis.io/scopes/fingoal/fingoal-scopes/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Fingoal Plans Pricing](https://apis.io/plans/fingoal/fingoal-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Fingoal Rate Limits](https://apis.io/rate-limits/fingoal/fingoal-rate-limits/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://fingoal.com/)
+- [Documentation](https://docs.fingoal.dev/)
+- [Getting started](https://docs.fingoal.dev/)
+- [API reference](https://docs.fingoal.dev/)
+- [Sign up](https://fingoal.com/request-developer-account)
+- [Support](https://fingoal.com/contact)
+- [Blog](https://fingoal.com/blog)
+- [Compliance](https://fingoal.com/fingoal-privacy-security)
+- [Terms of service](https://fingoal.com/terms)
+- [Privacy policy](https://fingoal.com/privacy)
+- [GitHub](https://github.com/fingoal)
+
+## API Evangelist rating
+
+**Kin Score 54.2** — developing · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 73.2 |
+| Contract quality | 58.8 |
+| Contract governance | 18.2 |
+| Operational transparency | 42.1 |
+| Developer ergonomics | 42.3 |
+| Access clarity | 50.0 |
+
+**Agent readiness 35.7** — agent-ready
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | — |
+| Reversibility Documented | — |
+| MCP Server | — |
+| Auth Clarity | negotiable (partial credit) |
+| Idempotency | — |
+| Error Semantics | verified |
+| OpenAPI Examples | partial |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | yes |
+| Agent Skills | derived (partial credit) |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+| Pagination Ratio | na |
+| Operation Distinctiveness | distinct |
+
+**Regulatory alignment 43.3** — Banking & Open Finance
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/fingoal/](https://apis.io/providers/fingoal/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for FinGoal: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/fingoal/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
